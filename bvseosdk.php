@@ -31,6 +31,9 @@
  * 
  */
 
+// Default charset will be used in case charset parameter is not properly configured by user.
+define ('DEFAULT_CHARSET', 'UTF-8');
+
 // ------------------------------------------------------------------------
 
 /**
@@ -50,6 +53,7 @@
  *      subject_type (string) (defaults to product, for questions you can pass in categories here if needed)
  *      content_sub_type (string) (defaults to stories, for stories you can pass either STORIES_LIST or STORIES_GRID content type)
  *      latency_timeout (int) (in milliseconds) (defaults to 1000ms)
+ *		charset (string) (defaults to UTF-8, to set alternate character for SDK output)
  *      bv_product (string) (defaults to reviews)
  *      bot_list (string) (defaults to msnbot|googlebot|teoma|bingbot|yandexbot|yahoo)
  */
@@ -91,6 +95,7 @@ class BV {
             'ssl_enabled' => FALSE,
             'proxy_host' => '',
             'proxy_port' => '',
+            'charset' => 'UTF-8',
             'seo_sdk_enabled' => TRUE,
         );
 
@@ -141,6 +146,8 @@ class BV {
 // class which inherits from Base.
 class Base{
 
+    protected $msg = '';
+
     public function __construct($params = array())
     {
         if ( ! $params)
@@ -168,6 +175,37 @@ class Base{
         }
     }
 
+    /*
+     * Check if charset is correct, if not set to default
+     */
+    private function _checkCharset()
+    {
+        if (isset($this->config['charset'])) {
+            $charset_check = mb_check_encoding($seo_content, $this->config['charset']);
+            if (!$charset_check) {
+                $this->config['charset'] = DEFAULT_CHARSET;
+                $this->msg .= "Charset is not configured properly. BV-SEO-SDK will load default charset and continue.; ";
+            }
+        } else {
+            $this->config['charset'] = DEFAULT_CHARSET;
+        }
+
+        return TRUE;
+    }
+
+    /*
+     * Return encoded content with set charset
+     */
+    private function _charsetEncode($seo_content)
+    {
+        if (isset($this->config['charset'])) {
+            $enc = mb_detect_encoding($seo_content);
+            $seo_content = mb_convert_encoding($seo_content, $this->config['charset'], $enc);
+        }
+        
+        return $seo_content;
+    }
+
     private function _getFullSeoContents($access_method)
     {
         // get the page number of SEO content to load
@@ -176,13 +214,17 @@ class Base{
         // build the URL to access the SEO content for
         // this product / page combination
         $seo_url = $this->_buildSeoUrl($page_number);
+        
+        $this->_checkCharset();
 
         // make call to get SEO payload from cloud unless seo_sdk_enabled is false
         // make call if bvreveal param in query string is set to 'debug'
         if ($this->_isSdkEnabled())
             $seo_content = $this->_fetchSeoContent($seo_url, $access_method);
         else    // show footer even if seo_sdk_enabled flag is false
-            $seo_content = $this->_buildComment('', $seo_url, $access_method);
+            $seo_content = $this->_buildComment('SEO SDK is disabled. Enable by setting seo.sdk.enabled to true.', $seo_url, $access_method);
+
+        $seo_content = $this->_charsetEncode($seo_content);
 
         // replace tokens for pagination URLs with page_url
         $seo_content = $this->_replaceTokens($seo_content);
@@ -458,7 +500,7 @@ class Base{
      * @return string (contents of file)
      */
     private function _fetchFileContent($path){
-        return file_get_contents($path);
+        return file_get_contents($path) . $this->_buildComment("Local file content was uploaded; ",$url,$access_method);;
     }
 
 
@@ -566,8 +608,8 @@ class Base{
         $footer .= "\n".'	<li id="ct">bvseo-'.strtoupper($this->config['bv_product']).'</li>';
     	$footer .= "\n".'	<li id="st">bvseo-'.strtoupper($this->config['subject_type']).'</li>';
     	$footer .= "\n"."	<li id='am'>bvseo-$access_method</li>";
-    	if (strlen($msg) > 0) {
-    		$footer .= "\n".'	<li id="ms">bvseo-msg: '.$msg.'</li>';
+    	if (strlen($msg) > 0 || strlen($this->msg) > 0) {
+    		$footer .= "\n".'	<li id="ms">bvseo-msg: ' . $this->msg . $msg.'</li>';
     	}
      	$footer .= "\n".'</ul>';   
      	
