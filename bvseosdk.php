@@ -48,6 +48,7 @@
  *      current_page_url (string) (defaults to detecting the current_page automatically)
  *      staging (boolean) (defaults to false, need to put true for testing with staging data)
  *      subject_type (string) (defaults to product, for questions you can pass in categories here if needed)
+ *      content_sub_type (string) (defaults to stories, for stories you can pass either STORIES_LIST or STORIES_GRID content type)
  *      latency_timeout (int) (in milliseconds) (defaults to 1000ms)
  *      bv_product (string) (defaults to reviews)
  *      bot_list (string) (defaults to msnbot|googlebot|teoma|bingbot|yandexbot|yahoo)
@@ -79,7 +80,8 @@ class BV {
             'staging' => FALSE,
             'subject_type' => 'product',
             'latency_timeout' => 1000,
-            'current_page_url' => $params['current_page_url'], //get the current page url passed in as a "parameter"
+             //get the current page url passed in as a "parameter"
+            'current_page_url' => isset($params['current_page_url']) ? $params['current_page_url'] : "",
             'base_page_url' => $this->_getCurrentUrl(),
             'bot_detection' => FALSE,  // bot detection should only be enabled if average execution time regularly exceeds 350ms.
             'include_display_integration_code' => FALSE,  
@@ -100,6 +102,9 @@ class BV {
 
         // setup the questions object
         $this->questions = new Questions($this->config);
+
+        // setup the stories object
+        $this->stories = new Stories($this->config);
         
         // setup the timer object
 
@@ -368,13 +373,14 @@ class Base{
             }
         }
         
-        
-        preg_match('/\/(\d+?)\/[^\/]+$/', $bvparam, $page_number);
-        $page_number = max(1, (int) $page_number[1]);
+        if (!empty($bvparam)) {
+            preg_match('/\/(\d+?)\/[^\/]+$/', $bvparam, $page_number);
+            $page_number = max(1, (int) $page_number[1]);
 
-        // remove the bvrrp parameter from the base URL so we don't keep appending it
-        $seo_param = str_replace('/', '\/', $bvparam); // need to escape slashes for regex
-        $this->config['base_page_url'] = preg_replace('/[?&]bvrrp='.$seo_param.'/', '', $this->config['base_page_url']);
+            // remove the bvrrp parameter from the base URL so we don't keep appending it
+            $seo_param = str_replace('/', '\/', $bvparam); // need to escape slashes for regex
+            $this->config['base_page_url'] = preg_replace('/[?&]bvrrp=' . $seo_param . '/', '', $this->config['base_page_url']);
+        }
 
         return $page_number;
     }// end of _getPageNumber()
@@ -405,9 +411,14 @@ class Base{
             $this->config['deployment_zone_id'],
             $this->config['bv_product'],
             $this->config['subject_type'],
-            $page_number,
-            urlencode($this->config['product_id']).'.htm'
+            $page_number
         );
+        
+        if (isset($this->config['content_sub_type']) && !empty($this->config['content_sub_type'])) {
+            $url_parts[] = $this->config['content_sub_type'];
+        }
+
+        $url_parts[] = urlencode($this->config['product_id']).'.htm';
 
         // if our SEO content source is a file path
         // we need to remove the first two sections
@@ -549,8 +560,10 @@ class Base{
     	} else {
     		$footer .= "\n".'	<li id="mt">bvseo-CLOUD</li>';
     	}
-    	$footer .= "\n".'	<li id="et">bvseo-'.$this->response_time.'ms</li>';
-    	$footer .= "\n".'	<li id="ct">bvseo-'.strtoupper($this->config['bv_product']).'</li>';
+        if (isset($this->response_time)) {
+            $footer .= "\n" . '	<li id="et">bvseo-' . $this->response_time . 'ms</li>';
+        }
+        $footer .= "\n".'	<li id="ct">bvseo-'.strtoupper($this->config['bv_product']).'</li>';
     	$footer .= "\n".'	<li id="st">bvseo-'.strtoupper($this->config['subject_type']).'</li>';
     	$footer .= "\n"."	<li id='am'>bvseo-$access_method</li>";
     	if (strlen($msg) > 0) {
@@ -633,7 +646,6 @@ class Reviews extends Base{
 
        // if they want to power display integration as well
        // then we need to include the JS integration code
-       // regardless of if it's a bot or not 
        if($this->config['include_display_integration_code'])
        {   
            $pay_load .= '
@@ -671,7 +683,6 @@ class Questions extends Base{
 
        // if they want to power display integration as well
        // then we need to include the JS integration code
-       // regardless of if it's a bot or not 
        if($this->config['include_display_integration_code'])
        {   
 
@@ -688,5 +699,56 @@ class Questions extends Base{
 
     }
 } // end of Questions class
+
+
+class Stories extends Base{
+
+    function __construct($params = array())
+    {
+        // call Base Class constructor
+        parent::__construct($params);
+
+        // since we are in the stories class
+        // we need to set the bv_product config
+        // to stories so we get stories in our
+        // SEO request
+        $this->config['bv_product'] = 'stories';
+
+        // for stories subject type will always
+        // need to be product
+        $this->config['subject_type'] = 'product';
+
+        // for stories we have to set content sub type
+        // the sub type is configured as either STORIES_LIST or STORIES_GRID
+        // the folder names are "stories" and "storiesgrid" respectively.
+        if (isset($this->config['content_sub_type'])
+                && $this->config['content_sub_type'] == "stories_grid") {
+            $this->config['content_sub_type'] = "storiesgrid";
+        } else {
+            $this->config['content_sub_type'] = "stories";
+        }
+    }
+
+    public function getContent()
+    {
+       $pay_load = $this->_renderSeo('getContent');
+
+       // if they want to power display integration as well
+       // then we need to include the JS integration code
+       if($this->config['include_display_integration_code'])
+       {
+           $pay_load .= '
+               <script>
+                   $BV.ui("su", "show_stories", {
+                       productId: "'.$this->config['product_id'].'"
+                   });
+               </script>
+           ';
+       }
+
+       return $pay_load;
+
+    }
+} // end of Stories class
 
 // end of bvsdk.php

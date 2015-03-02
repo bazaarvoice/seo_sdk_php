@@ -46,3 +46,5 @@ bot_list | msnbot, googlebot, teoma, bingbot, yandexbot, yahoo | No | Any regex 
 bot_detection | TRUE | TRUE or FALSE | No | Used for clients who are behind a CDN and want the SDK to return SEO content with every call. |
 include_display_integration_code |  FALSE | TRUE or FALSE | No | If you want the SDK to also include the JavaScript to power display as well.  You will need to include the bvapi.js file seperately.  |
 internal_file_path |  FALSE | '/home/zip/smart_seo/ | No | If you want to still download the zip file of SEO content and serve it from disk, you can pass the SDK an aboslute path to the unzipped folder of Smart SEO content.  |
+
+To run unit tests you should install [phpunit](https://phpunit.de/getting-started.html) tool and run `phpunit test` if you are going to run all tests or `phpunit test/<testName>` to run particular test from folder where bvseosdk.php file is placed.
