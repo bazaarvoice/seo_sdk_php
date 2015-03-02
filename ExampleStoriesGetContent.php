@@ -5,7 +5,7 @@ require('bvseosdk.php');
     'deployment_zone_id' => '',
     'product_id' => '',
     'cloud_key' => '',
-    'content_sub_type' => 'stories_list', // either STORIES_LIST or STORIES_GRID
+    'content_sub_type' => 'stories_grid', // either STORIES_LIST or STORIES_GRID
     'staging' => TRUE
     ));
 ?>
