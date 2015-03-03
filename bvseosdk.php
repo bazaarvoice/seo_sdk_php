@@ -53,7 +53,7 @@ define ('DEFAULT_CHARSET', 'UTF-8');
  *      subject_type (string) (defaults to product, for questions you can pass in categories here if needed)
  *      content_sub_type (string) (defaults to stories, for stories you can pass either STORIES_LIST or STORIES_GRID content type)
  *      latency_timeout (int) (in milliseconds) (defaults to 1000ms)
- *		charset (string) (defaults to UTF-8, to set alternate character for SDK output)
+ *      charset (string) (defaults to UTF-8, to set alternate character for SDK output)
  *      bv_product (string) (defaults to reviews)
  *      bot_list (string) (defaults to msnbot|googlebot|teoma|bingbot|yandexbot|yahoo)
  */
@@ -163,6 +163,13 @@ class Base{
     }
 
     /*
+     * Function for collecting messages
+     */
+    protected function _setBuildMessage($msg) {
+        $this->msg .= $msg;
+    }
+
+    /*
      * Return true if either seo_sdk_enabled or bvreveal flags are set, and false otherwise
      */
     private function _isSdkEnabled() {
@@ -184,7 +191,7 @@ class Base{
             $charset_check = mb_check_encoding($seo_content, $this->config['charset']);
             if (!$charset_check) {
                 $this->config['charset'] = DEFAULT_CHARSET;
-                $this->msg .= "Charset is not configured properly. BV-SEO-SDK will load default charset and continue.; ";
+                $this->_setBuildMessage("Charset is not configured properly. BV-SEO-SDK will load default charset and continue.; ");
             }
         } else {
             $this->config['charset'] = DEFAULT_CHARSET;
@@ -219,11 +226,14 @@ class Base{
 
         // make call to get SEO payload from cloud unless seo_sdk_enabled is false
         // make call if bvreveal param in query string is set to 'debug'
-        if ($this->_isSdkEnabled())
+        if ($this->_isSdkEnabled()) {
             $seo_content = $this->_fetchSeoContent($seo_url, $access_method);
-        else    // show footer even if seo_sdk_enabled flag is false
-            $seo_content = $this->_buildComment('SEO SDK is disabled. Enable by setting seo.sdk.enabled to true.', $seo_url, $access_method);
-
+        }
+        // show footer even if seo_sdk_enabled flag is false
+        else {
+            $this->_setBuildMessage('SEO SDK is disabled. Enable by setting seo.sdk.enabled to true.');
+            $seo_content = $this->_buildComment($seo_url, $access_method);
+        }
         $seo_content = $this->_charsetEncode($seo_content);
 
         // replace tokens for pagination URLs with page_url
@@ -306,7 +316,8 @@ class Base{
         }
         else
         {
-            $pay_load = $this->_buildComment('JavaScript-only Display','',$access_method);
+            $this->_setBuildMessage('JavaScript-only Display');
+            $pay_load = $this->_buildComment('',$access_method);
         }
 
         return $pay_load;
@@ -500,7 +511,8 @@ class Base{
      * @return string (contents of file)
      */
     private function _fetchFileContent($path){
-        return file_get_contents($path) . $this->_buildComment("Local file content was uploaded; ",$url,$access_method);;
+        $this->_setBuildMessage('Local file content was uploaded; ');
+        return file_get_contents($path) . $this->_buildComment($url,$access_method);
     }
 
 
@@ -548,23 +560,23 @@ class Base{
         // Close the cURL resource, and free system resources
         curl_close($ch);
 
-        $msg="";
-
         // see if we got any errors with the connection
         if($request['error_number'] != 0){
             $msg = 'Error - '.$request['error_message'];
-            $this->_buildComment($msg,$url,$access_method);
+            $this->_setBuildMessage($msg);
+            $this->_buildComment($url,$access_method);
         }
 
         // see if we got a status code of something other than 200
         if($request['info']['http_code'] != 200){
             $msg = 'HTTP status code of '.$request['info']['http_code'].' was returned';
-            return $this->_buildComment($msg,$url,$access_method);
+            $this->_setBuildMessage($msg);
+            return $this->_buildComment($url,$access_method);
         }
 
         // if we are here we got a response so let's return it
         $this->response_time = round($request['info']['total_time'] * 1000);
-        return $request['response'].$this->_buildComment($msg,$url,$access_method);
+        return $request['response'].$this->_buildComment($url,$access_method);
     }
 
     /**
@@ -593,7 +605,7 @@ class Base{
         return $content;
     }
 
-    private function _buildComment($msg,$url,$access_method){
+    private function _buildComment($url,$access_method){
     	$footer = '<ul id="BVSEOSDK" style="display:none;">';
     	$footer .= "\n".'	<li id="vn">bvseo-1.0.1.3-beta</li>';
     	$footer .= "\n".'	<li id="sl">bvseo-p</li>';
@@ -608,8 +620,8 @@ class Base{
         $footer .= "\n".'	<li id="ct">bvseo-'.strtoupper($this->config['bv_product']).'</li>';
     	$footer .= "\n".'	<li id="st">bvseo-'.strtoupper($this->config['subject_type']).'</li>';
     	$footer .= "\n"."	<li id='am'>bvseo-$access_method</li>";
-    	if (strlen($msg) > 0 || strlen($this->msg) > 0) {
-    		$footer .= "\n".'	<li id="ms">bvseo-msg: ' . $this->msg . $msg.'</li>';
+        if (strlen($this->msg) > 0) {
+            $footer .= "\n".'	<li id="ms">bvseo-msg: ' . $this->msg . '</li>';
     	}
      	$footer .= "\n".'</ul>';   
      	
