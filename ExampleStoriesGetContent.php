@@ -4,9 +4,10 @@ require('bvseosdk.php');
     $bv = new BV(array(
     'deployment_zone_id' => '',
     'product_id' => '',
-    'cloud_key' => '',
-    'content_sub_type' => 'stories_grid', // either STORIES_LIST or STORIES_GRID
-    'staging' => TRUE
+	'cloud_key' => '',
+	// either STORIES_LIST or STORIES_GRID
+	'content_sub_type' => 'stories_grid',
+	'staging' => TRUE
     ));
 ?>
 
