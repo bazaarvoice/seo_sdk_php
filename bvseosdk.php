@@ -166,7 +166,7 @@ class Base{
      * Function for collecting messages
      */
     protected function _setBuildMessage($msg) {
-        $this->msg .= $msg;
+        $this->msg .= $msg . '; ';
     }
 
     /*
@@ -191,7 +191,7 @@ class Base{
             $charset_check = mb_check_encoding($seo_content, $this->config['charset']);
             if (!$charset_check) {
                 $this->config['charset'] = DEFAULT_CHARSET;
-                $this->_setBuildMessage("Charset is not configured properly. BV-SEO-SDK will load default charset and continue.; ");
+                $this->_setBuildMessage("Charset is not configured properly. BV-SEO-SDK will load default charset and continue.");
             }
         } else {
             $this->config['charset'] = DEFAULT_CHARSET;
@@ -511,7 +511,7 @@ class Base{
      * @return string (contents of file)
      */
     private function _fetchFileContent($path){
-        $this->_setBuildMessage('Local file content was uploaded; ');
+        $this->_setBuildMessage('Local file content was uploaded');
         return file_get_contents($path) . $this->_buildComment($url,$access_method);
     }
 
@@ -562,15 +562,13 @@ class Base{
 
         // see if we got any errors with the connection
         if($request['error_number'] != 0){
-            $msg = 'Error - '.$request['error_message'];
-            $this->_setBuildMessage($msg);
+            $this->_setBuildMessage('Error - ' . $request['error_message']);
             $this->_buildComment($url,$access_method);
         }
 
         // see if we got a status code of something other than 200
         if($request['info']['http_code'] != 200){
-            $msg = 'HTTP status code of '.$request['info']['http_code'].' was returned';
-            $this->_setBuildMessage($msg);
+            $this->_setBuildMessage('HTTP status code of ' . $request['info']['http_code'] . ' was returned');
             return $this->_buildComment($url,$access_method);
         }
 
