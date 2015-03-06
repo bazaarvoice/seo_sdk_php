@@ -185,10 +185,10 @@ class Base{
     /*
      * Check if charset is correct, if not set to default
      */
-    private function _checkCharset()
+    private function _checkCharset($seo_content)
     {
         if (isset($this->config['charset'])) {
-            $charset_check = mb_check_encoding($seo_content, $this->config['charset']);
+            $charset_check = @mb_check_encoding($seo_content, $this->config['charset']);
             if (!$charset_check) {
                 $this->config['charset'] = DEFAULT_CHARSET;
                 $this->_setBuildMessage("Charset is not configured properly. BV-SEO-SDK will load default charset and continue.");
@@ -196,8 +196,6 @@ class Base{
         } else {
             $this->config['charset'] = DEFAULT_CHARSET;
         }
-
-        return TRUE;
     }
 
     /*
@@ -222,8 +220,6 @@ class Base{
         // this product / page combination
         $seo_url = $this->_buildSeoUrl($page_number);
         
-        $this->_checkCharset();
-
         // make call to get SEO payload from cloud unless seo_sdk_enabled is false
         // make call if bvreveal param in query string is set to 'debug'
         if ($this->_isSdkEnabled()) {
@@ -234,6 +230,7 @@ class Base{
             $this->_setBuildMessage('SEO SDK is disabled. Enable by setting seo.sdk.enabled to true.');
             $seo_content = $this->_buildComment($seo_url, $access_method);
         }
+        $this->_checkCharset($seo_content);
         $seo_content = $this->_charsetEncode($seo_content);
 
         // replace tokens for pagination URLs with page_url
