@@ -62,3 +62,4 @@ class CharsetTest extends PHPUnit_Framework_testCase
     }
 
 }
+
