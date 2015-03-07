@@ -3,11 +3,14 @@
 require_once 'bvseosdk.php';
 require_once 'test/config.php';
 
-define('CLOUD_KEY', 'myshco-3e3001e88d9c32d19a17cafacb81bec7');
-define('DEPLOYMENT_ZONE_ID', '9344');
-define('PRODUCT_ID', '12345');
-
+/**
+ * Test class to test Stories.
+ */
 class StoryTest extends PHPUnit_Framework_testCase {
+
+	public $cloud_key          = 'myshco-3e3001e88d9c32d19a17cafacb81bec7';
+	public $deployment_zone_id = '9344';
+	public $product_id			= '12345';
 
 	/**
 	 * Test stories.
@@ -17,10 +20,10 @@ class StoryTest extends PHPUnit_Framework_testCase {
 		$_SERVER['HTTP_USER_AGENT'] = "google";
 
 		$bv = new BV(array(
-			'deployment_zone_id' => DEPLOYMENT_ZONE_ID,
-			'product_id' => PRODUCT_ID,
-			'cloud_key' => CLOUD_KEY,
-			'staging' => TRUE,
+			'deployment_zone_id' => $this->deployment_zone_id,
+			'product_id'		 => $this->product_id,
+			'cloud_key'			 => $this->cloud_key,
+			'staging'			 => TRUE,
 		));
 
 		$content = $bv->stories->getContent();

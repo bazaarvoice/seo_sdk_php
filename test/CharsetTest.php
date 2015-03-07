@@ -3,11 +3,18 @@
 require_once 'bvseosdk.php';
 require_once 'test/config.php';
 
-define('CLOUD_KEY', 'test');
-define('DEPLOYMENT_ZONE_ID', 'test');
-define('PRODUCT_ID', 'test');
+/**
+ * Test class for testing charset stting
+ */
 
 class CharsetTest extends PHPUnit_Framework_testCase {
+
+	var $params = array(
+		'deployment_zone_id' => 'test',
+		'product_id'		 => 'test',
+		'cloud_key'			 => 'test',
+		'staging'			 => TRUE,
+	);
 
 	// Use reflection to test private methods
 	protected static function getMethod($name) {
@@ -21,13 +28,9 @@ class CharsetTest extends PHPUnit_Framework_testCase {
 	 * Test charset.
 	 */
 	public function testCharsetEncode() {
-		$params = array(
-			'deployment_zone_id' => DEPLOYMENT_ZONE_ID,
-			'product_id' => PRODUCT_ID,
-			'cloud_key' => CLOUD_KEY,
-			'staging' => TRUE,
-			'charset' =>'Windows-1251',
-    	);
+
+		$params['charset'] = 'Windows-1251';
+
 		$charsetEncode = self::getMethod('_charsetEncode');
 
 		$obj = new Base($params);
@@ -39,13 +42,9 @@ class CharsetTest extends PHPUnit_Framework_testCase {
 	}
 
 	public function testCharsetCheck() {
-		$params = array(
-			'deployment_zone_id' => DEPLOYMENT_ZONE_ID,
-			'product_id' => PRODUCT_ID,
-			'cloud_key' => CLOUD_KEY,
-			'staging' => TRUE,
-			'charset' =>'NOT_EXISTING_CHARSET',
-    	);
+
+		$params['charset'] = 'NOT_EXISTING_CHARSET';
+
 		$checkCharset = self::getMethod('_checkCharset');
 
 		// Check for set to default
