@@ -60,6 +60,6 @@ class CharsetTest extends PHPUnit_Framework_testCase
         $checkCharset->invokeArgs($obj, array("Hello world!"));
         $this->assertEquals("UTF-16", $obj->config['charset']);
     }
-
 }
 
+}
