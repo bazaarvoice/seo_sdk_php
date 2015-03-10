@@ -23,8 +23,8 @@ class StoryTest extends PHPUnit_Framework_testCase
         $bv = new BV(array(
             'deployment_zone_id' => $this->deployment_zone_id,
             'product_id' => $this->product_id,
-			'cloud_key' => $this->cloud_key,
-			'latency_timeout' => 5000,
+            'cloud_key' => $this->cloud_key,
+            'latency_timeout' => 5000,
             'staging' => TRUE,
         ));
 
