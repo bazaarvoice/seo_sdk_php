@@ -146,7 +146,7 @@ class BV {
 // class which inherits from Base.
 class Base{
 
-    protected $msg = '';
+    private $msg = '';
 
     public function __construct($params = array())
     {
@@ -213,28 +213,30 @@ class Base{
 
     private function _getFullSeoContents($access_method)
     {
+        $seo_content = '';
+
         // get the page number of SEO content to load
         $page_number = $this->_getPageNumber();
 
         // build the URL to access the SEO content for
         // this product / page combination
-        $seo_url = $this->_buildSeoUrl($page_number);
+        $this->seo_url = $this->_buildSeoUrl($page_number);
         
         // make call to get SEO payload from cloud unless seo_sdk_enabled is false
         // make call if bvreveal param in query string is set to 'debug'
         if ($this->_isSdkEnabled()) {
-            $seo_content = $this->_fetchSeoContent($seo_url, $access_method);
+            $seo_content = $this->_fetchSeoContent($this->seo_url);
+
+            $this->_checkCharset($seo_content);
+            $seo_content = $this->_charsetEncode($seo_content);
+
+            // replace tokens for pagination URLs with page_url
+            $seo_content = $this->_replaceTokens($seo_content);
         }
         // show footer even if seo_sdk_enabled flag is false
         else {
             $this->_setBuildMessage('SEO SDK is disabled. Enable by setting seo.sdk.enabled to true.');
-            $seo_content = $this->_buildComment($seo_url, $access_method);
         }
-        $this->_checkCharset($seo_content);
-        $seo_content = $this->_charsetEncode($seo_content);
-
-        // replace tokens for pagination URLs with page_url
-        $seo_content = $this->_replaceTokens($seo_content);
 
         $pay_load = $seo_content;
 
@@ -306,6 +308,7 @@ class Base{
      */
     protected function _renderSEO($access_method)
     {
+		$pay_load = '';
         // we only want to render SEO when it's a search engine bot
         if ($this->_isBot())
         {
@@ -314,9 +317,8 @@ class Base{
         else
         {
             $this->_setBuildMessage('JavaScript-only Display');
-            $pay_load = $this->_buildComment('',$access_method);
         }
-
+        $pay_load .= $this->_buildComment($access_method);
         return $pay_load;
     }
 
@@ -485,15 +487,15 @@ class Base{
         return implode("/", $url_parts);
     }
 
-    private function _fetchSeoContent($resource, $access_method)
+    private function _fetchSeoContent($resource)
     {
-        if($this->config['internal_file_path'])
+        if(!empty($this->config['internal_file_path']))
         {
             return $this->_fetchFileContent($resource);
         }
         else
         {
-            return $this->_fetchCloudContent($resource, $access_method);
+            return $this->_fetchCloudContent($resource);
         }
     }
 
@@ -509,7 +511,7 @@ class Base{
      */
     private function _fetchFileContent($path){
         $this->_setBuildMessage('Local file content was uploaded');
-        return file_get_contents($path) . $this->_buildComment($url,$access_method);
+        return file_get_contents($path);
     }
 
 
@@ -523,7 +525,7 @@ class Base{
      * @param string (valid url)
      * @return string
      */
-    private function _fetchCloudContent($url, $access_method){
+    private function _fetchCloudContent($url){
 
         // is cURL installed yet?
         // if ( ! function_exists('curl_init')){
@@ -560,18 +562,17 @@ class Base{
         // see if we got any errors with the connection
         if($request['error_number'] != 0){
             $this->_setBuildMessage('Error - ' . $request['error_message']);
-            $this->_buildComment($url,$access_method);
         }
 
         // see if we got a status code of something other than 200
         if($request['info']['http_code'] != 200){
             $this->_setBuildMessage('HTTP status code of ' . $request['info']['http_code'] . ' was returned');
-            return $this->_buildComment($url,$access_method);
+            return '';
         }
 
         // if we are here we got a response so let's return it
         $this->response_time = round($request['info']['total_time'] * 1000);
-        return $request['response'].$this->_buildComment($url,$access_method);
+        return $request['response'];
     }
 
     /**
@@ -600,7 +601,7 @@ class Base{
         return $content;
     }
 
-    private function _buildComment($url,$access_method){
+    private function _buildComment($access_method){
     	$footer = '<ul id="BVSEOSDK" style="display:none;">';
     	$footer .= "\n".'	<li id="vn">bvseo-1.0.1.3-beta</li>';
     	$footer .= "\n".'	<li id="sl">bvseo-p</li>';
@@ -640,7 +641,7 @@ class Base{
                 $footer .= "\n".'   <li id="subjectID">'.urlencode($this->config['product_id']).'</li>';
                 $footer .= "\n".'   <li id="contentType">'.strtoupper($this->config['bv_product']).'</li>';
                 $footer .= "\n".'   <li id="subjectType">'.strtoupper($this->config['subject_type']).'</li>';
-                $footer .= "\n".'   <li id="contentURL">'.$url.'</li>';
+                $footer .= "\n".'   <li id="contentURL">'.$this->seo_url.'</li>';
                 $footer .= "\n".'</ul>';        
             }
         }

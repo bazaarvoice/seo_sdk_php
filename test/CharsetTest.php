@@ -9,10 +9,9 @@ require_once 'test/config.php';
 class CharsetTest extends PHPUnit_Framework_testCase
 {
     var $params = array(
-        'deployment_zone_id' => 'test',
-        'product_id' => 'test',
-        'cloud_key' => 'test',
-        'staging' => TRUE,
+        'execution_timeout' => 5000,
+        'execution_timeout_bot' => 5000,
+        'bvreveal' => 'debug'
     );
 
     // Use reflection to test private methods
@@ -30,11 +29,11 @@ class CharsetTest extends PHPUnit_Framework_testCase
     public function testCharsetEncode()
     {
 
-        $params['charset'] = 'Windows-1251';
+        $this->params['charset'] = 'Windows-1251';
 
         $charsetEncode = self::getMethod('_charsetEncode');
 
-        $obj = new Base($params);
+        $obj = new Base($this->params);
         $a = $charsetEncode->invokeArgs($obj, array("This is the Euro symbol 'в‚¬'"));
         $this->assertEquals("This is the Euro symbol '€'", $a);
 
@@ -45,21 +44,20 @@ class CharsetTest extends PHPUnit_Framework_testCase
     public function testCharsetCheck()
     {
 
-        $params['charset'] = 'NOT_EXISTING_CHARSET';
+        $this->params['charset'] = 'NOT_EXISTING_CHARSET';
 
         $checkCharset = self::getMethod('_checkCharset');
 
         // Check for set to default
-        $obj = new Base($params);
+        $obj = new Base($this->params);
         $checkCharset->invokeArgs($obj, array("Hello world!"));
         $this->assertEquals("UTF-8", $obj->config['charset']);
 
         // Check correct charset
-        $params['charset'] = 'UTF-16';
-        $obj = new Base($params);
+        $this->params['charset'] = 'UTF-16';
+        $obj = new Base($this->params);
         $checkCharset->invokeArgs($obj, array("Hello world!"));
         $this->assertEquals("UTF-16", $obj->config['charset']);
     }
 
 }
-
