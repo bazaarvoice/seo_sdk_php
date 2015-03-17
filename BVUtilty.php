@@ -38,7 +38,7 @@ class BVUtilty
                 $length = array_fill(0, $num, 0);
             } elseif (is_array($length)) {
                 $length = array_slice($length, 0, $num);
-?bvreveal=debug                foreach ($length as $key => $value)
+                foreach ($length as $key => $value)
                     $length[$key] = isset($value) ? (is_int($value) ? $value : $num) : 0;
             } else {
                 $length = array_pad(array($length), $num, $length);
