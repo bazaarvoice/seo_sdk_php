@@ -30,6 +30,7 @@
  * ));
  * 
  */
+require_once 'BVUtilty.php';
 
 // Default charset will be used in case charset parameter is not properly configured by user.
 define ('DEFAULT_CHARSET', 'UTF-8');
@@ -246,17 +247,17 @@ class Base{
     private function _replaceSection($str, $search_str_begin, $search_str_end)
     {
         $result = $str;
-        $start_index = strrpos($str, $search_str_begin);
+        $start_index = mb_strrpos($str, $search_str_begin);
 
         if ($start_index !== false)
         {
-            $end_index = strrpos($str, $search_str_end);
+            $end_index = mb_strrpos($str, $search_str_end);
 
             if ($end_index !== false)
             {
-                $end_index += strlen($search_str_end);
+                $end_index += mb_strlen($search_str_end);
                 $length = $end_index - $start_index;
-                $result = substr_replace($str, '', $start_index, $length);
+                $result = BVUtilty::mb_substr_replace($str, '', $start_index, $length);
             }
         }
 
@@ -347,7 +348,7 @@ class Base{
         }
 
         // search the user agent string for an indication if this is a search bot or not
-        return preg_match('/('.$this->config['bot_list'].')/i', $_SERVER['HTTP_USER_AGENT']);
+        return mb_eregi('('.$this->config['bot_list'].')', $_SERVER['HTTP_USER_AGENT']);
     }
 
     /**
@@ -368,7 +369,7 @@ class Base{
 
         $query = $currentUrlArray['path']; //get the path out of the parsed url array
                                 
-        parse_str($query, $bvcurrentpagedata);  //parse the sub url such that you get the important part...page number
+        mb_parse_str($query, $bvcurrentpagedata);  //parse the sub url such that you get the important part...page number
                                 
         // bvpage is not currently implemented
         if (isset($_GET['bvpage']) ){
@@ -376,7 +377,7 @@ class Base{
 
             // remove the bvpage parameter from the base URL so we don't keep appending it
             $seo_param = str_replace('/', '\/', $_GET['bvrrp']); // need to escape slashes for regex
-            $this->config['base_page_url'] = preg_replace('/[?&]bvrrp='.$seo_param.'/', '', $this->config['base_page_url']);
+            $this->config['base_page_url'] = mb_ereg_replace('[?&]bvrrp='.$seo_param, '', $this->config['base_page_url']);
         }
         // other implementations use the bvrrp, bvqap, or bvsyp parameter ?bvrrp=1234-en_us/reviews/product/2/ASF234.htm
         else if(isset($_GET['bvrrp']) OR isset($_GET['bvqap']) OR isset($_GET['bvsyp']) ){
@@ -403,7 +404,7 @@ class Base{
                $bvparam=$bvcurrentpagedata['bvpage'];
             // remove the bvpage parameter from the base URL so we don't keep appending it
                $seo_param = str_replace('/', '\/', $_GET['bvrrp']); // need to escape slashses for regex
-               $this->config['base_page_url'] = preg_replace('/[?&]bvrrp='.$seo_param.'/', '', $this->config['base_page_url']);
+               $this->config['base_page_url'] = mb_ereg_replace('[?&]bvrrp='.$seo_param, '', $this->config['base_page_url']);
             }
             // other implementations use the bvrrp, bvqap, or bvsyp parameter ?bvrrp=1234-en_us/reviews/product/2/ASF234.htm
             else if(isset($bvcurrentpagedata['bvrrp'])
@@ -426,12 +427,12 @@ class Base{
         }
         
         if (!empty($bvparam)) {
-            preg_match('/\/(\d+?)\/[^\/]+$/', $bvparam, $page_number);
+            mb_ereg('\/(\d+?)\/[^\/]+$', $bvparam, $page_number);
             $page_number = max(1, (int) $page_number[1]);
 
             // remove the bvrrp parameter from the base URL so we don't keep appending it
             $seo_param = str_replace('/', '\/', $bvparam); // need to escape slashes for regex
-            $this->config['base_page_url'] = preg_replace('/[?&]bvrrp=' . $seo_param . '/', '', $this->config['base_page_url']);
+            $this->config['base_page_url'] = mb_ereg_replace('[?&]bvrrp='.$seo_param, '', $this->config['base_page_url']);
         }
 
         return $page_number;
@@ -613,10 +614,10 @@ class Base{
         if (isset($this->response_time)) {
             $footer .= "\n" . '	<li id="et">bvseo-' . $this->response_time . 'ms</li>';
         }
-        $footer .= "\n".'	<li id="ct">bvseo-'.strtoupper($this->config['bv_product']).'</li>';
-    	$footer .= "\n".'	<li id="st">bvseo-'.strtoupper($this->config['subject_type']).'</li>';
+        $footer .= "\n".'	<li id="ct">bvseo-'.mb_strtoupper($this->config['bv_product']).'</li>';
+    	$footer .= "\n".'	<li id="st">bvseo-'.mb_strtoupper($this->config['subject_type']).'</li>';
     	$footer .= "\n"."	<li id='am'>bvseo-$access_method</li>";
-        if (strlen($this->msg) > 0) {
+        if (mb_strlen($this->msg) > 0) {
             $footer .= "\n".'	<li id="ms">bvseo-msg: ' . $this->msg . '</li>';
     	}
      	$footer .= "\n".'</ul>';   
@@ -639,8 +640,8 @@ class Base{
                 $footer .= "\n".'   <li id="pageURI">'.$this->config['current_page_url'].'</li>';
                 $footer .= "\n".'   <li id="baseURI">'.$this->config['base_page_url'].'</li>';
                 $footer .= "\n".'   <li id="subjectID">'.urlencode($this->config['product_id']).'</li>';
-                $footer .= "\n".'   <li id="contentType">'.strtoupper($this->config['bv_product']).'</li>';
-                $footer .= "\n".'   <li id="subjectType">'.strtoupper($this->config['subject_type']).'</li>';
+                $footer .= "\n".'   <li id="contentType">'.mb_strtoupper($this->config['bv_product']).'</li>';
+                $footer .= "\n".'   <li id="subjectType">'.mb_strtoupper($this->config['subject_type']).'</li>';
                 $footer .= "\n".'   <li id="contentURL">'.$this->seo_url.'</li>';
                 $footer .= "\n".'</ul>';        
             }
