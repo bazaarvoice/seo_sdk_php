@@ -642,6 +642,7 @@ class Base{
                 $footer .= "\n".'   <li id="subjectID">'.urlencode($this->config['product_id']).'</li>';
                 $footer .= "\n".'   <li id="contentType">'.mb_strtoupper($this->config['bv_product']).'</li>';
                 $footer .= "\n".'   <li id="subjectType">'.mb_strtoupper($this->config['subject_type']).'</li>';
+                $footer .= "\n".'   <li id="seo.sdk.charset">' . $this->config['charset'] . '</li>';
                 $footer .= "\n".'   <li id="contentURL">'.$this->seo_url.'</li>';
                 $footer .= "\n".'</ul>';        
             }
