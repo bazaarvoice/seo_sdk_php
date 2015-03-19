@@ -256,8 +256,10 @@ class Base{
             if ($end_index !== false)
             {
                 $end_index += mb_strlen($search_str_end);
-                $length = $end_index - $start_index;
-                $result = BVUtilty::mb_substr_replace($str, '', $start_index, $length);
+                $str_begin = mb_substr($str, 0, $start_index);
+                $str_end = mb_substr($str, $end_index);
+                
+                $result = $str_begin . $str_end;
             }
         }
 
@@ -291,7 +293,7 @@ class Base{
 
             // Remove schema.org product text from reviews if it exists
             $schema_org_text = "itemscope itemtype=\"http://schema.org/Product\"";
-            $pay_load = str_replace($schema_org_text, '', $pay_load);
+            $pay_load = mb_ereg_replace($schema_org_text, '', $pay_load);
         }
 
         return $pay_load;
@@ -376,7 +378,7 @@ class Base{
             $page_number = (int) $_GET['bvpage'];
 
             // remove the bvpage parameter from the base URL so we don't keep appending it
-            $seo_param = str_replace('/', '\/', $_GET['bvrrp']); // need to escape slashes for regex
+            $seo_param = mb_ereg_replace('/', '\/', $_GET['bvrrp']); // need to escape slashes for regex
             $this->config['base_page_url'] = mb_ereg_replace('[?&]bvrrp='.$seo_param, '', $this->config['base_page_url']);
         }
         // other implementations use the bvrrp, bvqap, or bvsyp parameter ?bvrrp=1234-en_us/reviews/product/2/ASF234.htm
@@ -403,7 +405,7 @@ class Base{
                $page_number = (int) $bvcurrentpagedata['bvpage'];
                $bvparam=$bvcurrentpagedata['bvpage'];
             // remove the bvpage parameter from the base URL so we don't keep appending it
-               $seo_param = str_replace('/', '\/', $_GET['bvrrp']); // need to escape slashses for regex
+               $seo_param = mb_ereg_replace('/', '\/', $_GET['bvrrp']); // need to escape slashses for regex
                $this->config['base_page_url'] = mb_ereg_replace('[?&]bvrrp='.$seo_param, '', $this->config['base_page_url']);
             }
             // other implementations use the bvrrp, bvqap, or bvsyp parameter ?bvrrp=1234-en_us/reviews/product/2/ASF234.htm
@@ -431,7 +433,7 @@ class Base{
             $page_number = max(1, (int) $page_number[1]);
 
             // remove the bvrrp parameter from the base URL so we don't keep appending it
-            $seo_param = str_replace('/', '\/', $bvparam); // need to escape slashes for regex
+            $seo_param = mb_ereg_replace('/', '\/', $bvparam); // need to escape slashes for regex
             $this->config['base_page_url'] = mb_ereg_replace('[?&]bvrrp='.$seo_param, '', $this->config['base_page_url']);
         }
 
@@ -597,7 +599,7 @@ class Base{
             $page_url_query_prefix = '?';
         }
 
-        $content = str_replace('{INSERT_PAGE_URI}', $this->config['base_page_url'] . $page_url_query_prefix, $content); 
+        $content = mb_ereg_replace('{INSERT_PAGE_URI}', $this->config['base_page_url'] . $page_url_query_prefix, $content);
 
         return $content;
     }
