@@ -189,8 +189,8 @@ class Base{
     private function _checkCharset($seo_content)
     {
         if (isset($this->config['charset'])) {
-            $charset_check = @mb_check_encoding($seo_content, $this->config['charset']);
-            if (!$charset_check) {
+            $supportedCharsets = mb_list_encodings();
+            if (!in_array($this->config['charset'], $supportedCharsets)) {
                 $this->config['charset'] = DEFAULT_CHARSET;
                 $this->_setBuildMessage("Charset is not configured properly. BV-SEO-SDK will load default charset and continue.");
             }
