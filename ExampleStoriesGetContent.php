@@ -11,6 +11,7 @@ require('bvseosdk.php');
     ));
 ?>
 
+<!DOCTYPE html>
 <html>
 <head>
     <title>BV SDK PHP Example - GetContent</title>

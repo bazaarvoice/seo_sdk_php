@@ -9,6 +9,7 @@
     ));
 ?>
 
+<!DOCTYPE html>
 <html>
 <head>
     <title>BV SDK PHP Example - getReviews</title>
