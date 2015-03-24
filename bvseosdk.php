@@ -29,7 +29,11 @@
  * ));
  *
  */
-require_once 'BVUtilty.php';
+require_once 'BVUtility.php';
+
+// Should be declared in file where _execTimer will be used.
+// If declared in the another file it does not affect the current file.
+declare(ticks = 1);
 
 // Default charset will be used in case charset parameter is not properly configured by user.
 define('DEFAULT_CHARSET', 'UTF-8');
@@ -52,7 +56,8 @@ define('DEFAULT_CHARSET', 'UTF-8');
  *      staging (boolean) (defaults to false, need to put true for testing with staging data)
  *      subject_type (string) (defaults to product, for questions you can pass in categories here if needed)
  *      content_sub_type (string) (defaults to stories, for stories you can pass either STORIES_LIST or STORIES_GRID content type)
- *      latency_timeout (int) (in milliseconds) (defaults to 1000ms)
+ *      execution_timeout (int) (in milliseconds) (defaults to 500ms, to set period of time before the BVSEO injection times out for user agents that do not match the criteria set in CRAWLER_AGENT_PATTERN)
+ *      execution_timeout_bot (int) (in milliseconds) (defaults to 2000ms, to set period of time before the BVSEO injection times out for user agents that match the criteria set in CRAWLER_AGENT_PATTERN)
  *      charset (string) (defaults to UTF-8, to set alternate character for SDK output)
  *      bv_product (string) (defaults to reviews)
  *      bot_list (string) (defaults to msnbot|googlebot|teoma|bingbot|yandexbot|yahoo)
@@ -82,12 +87,9 @@ class BV
         $this->config = array(
             'staging' => FALSE,
             'subject_type' => 'product',
-            'latency_timeout' => 1000,
             //get the current page url passed in as a "parameter"
             'current_page_url' => isset($params['current_page_url']) ? $params['current_page_url'] : "",
             'base_page_url' => $this->_getCurrentUrl(),
-            // bot detection should only be enabled if average execution time regularly exceeds 350ms.
-            'bot_detection' => FALSE,
             'include_display_integration_code' => FALSE,
             'client_name' => $params['deployment_zone_id'],
             'internal_file_path' => FALSE,
@@ -98,6 +100,8 @@ class BV
             'proxy_port' => '',
             'charset' => 'UTF-8',
             'seo_sdk_enabled' => TRUE,
+            'execution_timeout' => 500,
+            'execution_timeout_bot' => 2000,
         );
 
         // merge passed in params with defaults for config.
@@ -144,6 +148,7 @@ class BV
 
 }
 // end of BV class
+
 // Most shared functionality is here so when we add support for questions
 // and answers it should be minimal changes. Just need to create an answers
 // class which inherits from Base.
@@ -162,6 +167,10 @@ class Base
         // setup bv (internal) defaults
         $this->bv_config['seo-domain']['staging'] = 'seo-stg.bazaarvoice.com';
         $this->bv_config['seo-domain']['production'] = 'seo.bazaarvoice.com';
+
+        $this->config['latency_timeout'] = $this->_isBot()
+                ? $this->config['execution_timeout_bot']
+                : $this->config['execution_timeout'];
     }
 
     /**
@@ -313,9 +322,22 @@ class Base
     protected function _renderSEO($access_method)
     {
         $pay_load = '';
-        // we only want to render SEO when it's a search engine bot
-        if ($this->_isBot()) {
-            $pay_load = $this->_getFullSeoContents($access_method);
+
+        $isBot = $this->_isBot();
+
+        if (!$isBot && $this->config['latency_timeout'] == 0) {
+            $this->_setBuildMessage("EXECUTION_TIMEOUT is set to 0 ms; JavaScript-only Display.");
+        } else if ($isBot) { // we only want to render SEO when it's a search engine bot
+            if ($this->config['latency_timeout'] < 100) {
+                $this->config['latency_timeout'] = 100;
+                $this->_setBuildMessage("EXECUTION_TIMEOUT_BOT is less than the minimum value allowed. Minimum value of 100ms used.");
+            }
+            try {
+                BVUtility::execTimer($this->config['latency_timeout'], true);
+                $pay_load = $this->_getFullSeoContents($access_method);
+            } catch (Exception $e) {
+                $this->_setBuildMessage($e->getMessage());
+            }
         } else {
             $this->_setBuildMessage('JavaScript-only Display');
         }
@@ -338,10 +360,7 @@ class Base
      */
     private function _isBot()
     {
-        // we need to check the user agent string to see if this is a bot,
-        // unless the bvreveal parameter is there or we have disabled bot
-        // detection through the bot_detection flag
-        if (isset($_GET['bvreveal']) OR !$this->config['bot_detection']) {
+        if (isset($_GET['bvreveal'])) {
             return TRUE;
         }
 
@@ -362,12 +381,15 @@ class Base
         // default to page 1 if a page is not specified in the URL
         $page_number = 1;
 
-        //parse the current url that's passed in via the parameters
-        $currentUrlArray = parse_url($this->config['current_page_url']);
+        if (!empty($this->config['current_page_url'])) {
+            //parse the current url that's passed in via the parameters
+            $currentUrlArray = parse_url($this->config['current_page_url']);
 
-        $query = $currentUrlArray['path']; //get the path out of the parsed url array
+            $query = $currentUrlArray['path']; //get the path out of the parsed url array
 
-        mb_parse_str($query, $bvcurrentpagedata);  //parse the sub url such that you get the important part...page number
+            mb_parse_str($query, $bvcurrentpagedata);  //parse the sub url such that you get the important part...page number
+        }
+
         // bvpage is not currently implemented
         if (isset($_GET['bvpage'])) {
             $page_number = (int) $_GET['bvpage'];
@@ -386,8 +408,7 @@ class Base
                 $bvparam = $_GET['bvsyp'];
             }
         } else if (isset($bvcurrentpagedata)) {  //if the base url doesn't include the page number information and the current url
-        //is defined then use the data from the current URL.
-
+            //is defined then use the data from the current URL.
             if (isset($bvcurrentpagedata['bvpage'])) {
                 $page_number = (int) $bvcurrentpagedata['bvpage'];
                 $bvparam = $bvcurrentpagedata['bvpage'];
@@ -593,7 +614,7 @@ class Base
         $footer = '<ul id="BVSEOSDK" style="display:none;">';
         $footer .= "\n" . '	<li id="vn">bvseo-1.0.1.3-beta</li>';
         $footer .= "\n" . '	<li id="sl">bvseo-p</li>';
-        if ($this->config['internal_file_path']) {
+        if (!empty($this->config['internal_file_path'])) {
             $footer .= "\n" . '	<li id="mt">bvseo-FILE</li>';
         } else {
             $footer .= "\n" . '	<li id="mt">bvseo-CLOUD</li>';
@@ -682,7 +703,7 @@ class Reviews extends Base
 
     public function getContent()
     {
-        $pay_load = $this->_renderSeo('getContent');
+        $pay_load = $this->_renderSEO('getContent');
 
         // if they want to power display integration as well
         // then we need to include the JS integration code
@@ -719,7 +740,7 @@ class Questions extends Base
 
     public function getContent()
     {
-        $pay_load = $this->_renderSeo('getContent');
+        $pay_load = $this->_renderSEO('getContent');
 
         // if they want to power display integration as well
         // then we need to include the JS integration code
