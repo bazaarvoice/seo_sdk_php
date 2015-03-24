@@ -11,7 +11,8 @@ class CharsetTest extends PHPUnit_Framework_testCase
     var $params = array(
         'execution_timeout' => 5000,
         'execution_timeout_bot' => 5000,
-        'bvreveal' => 'debug'
+        'bvreveal' => 'debug',
+        'bot_list' => 'msnbot|google|teoma|bingbot|yandexbot|yahoo',
     );
 
     // Use reflection to test private methods
@@ -28,7 +29,7 @@ class CharsetTest extends PHPUnit_Framework_testCase
      */
     public function testCharsetEncode()
     {
-
+        $_SERVER['HTTP_USER_AGENT'] = "google";
         $this->params['charset'] = 'Windows-1251';
 
         $charsetEncode = self::getMethod('_charsetEncode');
@@ -43,7 +44,7 @@ class CharsetTest extends PHPUnit_Framework_testCase
 
     public function testCharsetCheck()
     {
-
+        $_SERVER['HTTP_USER_AGENT'] = "google";
         $this->params['charset'] = 'NOT_EXISTING_CHARSET';
 
         $checkCharset = self::getMethod('_checkCharset');
