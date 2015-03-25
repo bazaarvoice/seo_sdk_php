@@ -8,7 +8,7 @@ require_once 'test/config.php';
  */
 class BVFooterTest extends PHPUnit_Framework_testCase
 {
-      var $params = array(
+    var $params = array(
         'bv_root_folder' => 'test',
         'subject_id' => 'test',
         'cloud_key' => 'test',
@@ -18,8 +18,8 @@ class BVFooterTest extends PHPUnit_Framework_testCase
         'ssl_enabled' => TRUE,
         'crawler_agent_pattern' => 'msnbot|google|teoma|bingbot|yandexbot|yahoo',
         'bvreveal' => 'debug',
-        'bv_product'=> 'product',
-        'subject_type'=> 'category',
+        'bv_product' => 'product',
+        'subject_type' => 'category',
         'execution_timeout' => 300,
         'execution_timeout_bot' => 400,
         'content_type' => 'product',
@@ -42,7 +42,7 @@ class BVFooterTest extends PHPUnit_Framework_testCase
         $base->start_time = "500";
         $bvFooter = new BVFooter($base, $access_method, $msg);
         $res = $bvFooter->buildSDKFooter();
-        
+
         $this->assertContains('li data-bvseo="ms">bvseo-msg:', $res);
         $this->assertContains('data-bvseo="sdk">bvseo, net_sdk,', $res);
         $this->assertContains('<li data-bvseo="sp_mt">CLOUD, getContent', $res);
@@ -55,9 +55,9 @@ class BVFooterTest extends PHPUnit_Framework_testCase
     public function testBuildSDKDebugFooter()
     {
         $_SERVER['HTTP_USER_AGENT'] = "google";
-        
+
         $base = new Base($this->params);
-        
+
         $access_method = 'getContent';
         $msg = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit,'
                 . ' sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
@@ -83,4 +83,5 @@ class BVFooterTest extends PHPUnit_Framework_testCase
         $this->assertContains('<li data-bvseo="baseURI">test.bv</li>', $res);
         $this->assertContains('<li data-bvseo="contentURL">test.com</li>', $res);
     }
+
 }
