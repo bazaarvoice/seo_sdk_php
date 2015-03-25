@@ -327,20 +327,22 @@ class Base
 
         if (!$isBot && $this->config['latency_timeout'] == 0) {
             $this->_setBuildMessage("EXECUTION_TIMEOUT is set to 0 ms; JavaScript-only Display.");
-        } else if ($isBot) { // we only want to render SEO when it's a search engine bot
-            if ($this->config['latency_timeout'] < 100) {
+        } else {
+
+            if ($isBot && $this->config['latency_timeout'] < 100) {
                 $this->config['latency_timeout'] = 100;
                 $this->_setBuildMessage("EXECUTION_TIMEOUT_BOT is less than the minimum value allowed. Minimum value of 100ms used.");
             }
+
             try {
-                BVUtility::execTimer($this->config['latency_timeout'], true);
+                BVUtility::execTimer($this->config['latency_timeout'], $isBot);
                 $pay_load = $this->_getFullSeoContents($access_method);
             } catch (Exception $e) {
                 $this->_setBuildMessage($e->getMessage());
             }
-        } else {
-            $this->_setBuildMessage('JavaScript-only Display');
+            BVUtility::stopTimer();
         }
+
         $pay_load .= $this->_buildComment($access_method);
         return $pay_load;
     }
