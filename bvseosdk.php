@@ -629,51 +629,12 @@ class Base
 
     private function _buildComment($access_method)
     {
-        $footer = '<ul id="BVSEOSDK" style="display:none;">';
-        $footer .= "\n" . '	<li id="vn">bvseo-2.2.0.1</li>';
-        $footer .= "\n" . '	<li id="sl">bvseo-p</li>';
-        if (isset($this->config['internal_file_path']) && !empty($this->config['internal_file_path'])) {
-            $footer .= "\n" . '	<li id="mt">bvseo-FILE</li>';
-        } else {
-            $footer .= "\n" . '	<li id="mt">bvseo-CLOUD</li>';
+        $bvf = new BVFooter($this, $access_method, $this->msg);
+        $footer = $bvf->buildSDKFooter();
+        if (isset($_GET['bvreveal']) && $_GET['bvreveal'] == 'debug') {
+            $footer .= $bvf->buildSDKDebugFooter();
         }
-        if (isset($this->response_time)) {
-            $footer .= "\n" . '	<li id="et">bvseo-' . $this->response_time . 'ms</li>';
-        }
-        $footer .= "\n" . '	<li id="ct">bvseo-' . mb_strtoupper($this->config['bv_product']) . '</li>';
-        $footer .= "\n" . '	<li id="st">bvseo-' . mb_strtoupper($this->config['subject_type']) . '</li>';
-        $footer .= "\n" . '	<li id="am">bvseo-' . $access_method . '</li>';
-        if (mb_strlen($this->msg) > 0) {
-            $footer .= "\n" . '	<li id="ms">bvseo-msg: ' . $this->msg . '</li>';
-        }
-        $footer .= "\n" . '</ul>';
-
-        //when in debug mode, also display the following information
-        if (isset($_GET['bvreveal'])) {
-            if ($_GET['bvreveal'] == 'debug') {
-                $footer .= "\n" . '<ul id="BVSEOSDK_DEBUG" style="display:none;">';
-                $footer .= "\n" . '   <li id="cloudKey">' . $this->config['cloud_key'] . '</li>';
-                $footer .= "\n" . '   <li id="bv.root.folder">' . $this->config['deployment_zone_id'] . '</li>';
-                $footer .= "\n" . '   <li id="stagingS3Hostname">' . $this->bv_config['seo-domain']['staging'] . '</li>';
-                $footer .= "\n" . '   <li id="productionS3Hostname">' . $this->bv_config['seo-domain']['production'] . '</li>';
-                $staging = ($this->config['staging']) ? 'TRUE' : 'FALSE';
-                $footer .= "\n" . '   <li id="staging">' . $staging . '</li>';
-                $footer .= "\n" . '   <li id="seo.sdk.execution.timeout">' . $this->config['latency_timeout'] . '</li>';
-                $footer .= "\n" . '   <li id="crawlerAgentPattern">' . $this->config['bot_list'] . '</li>';
-                $footer .= "\n" . '   <li id="userAgent">' . $_SERVER['HTTP_USER_AGENT'] . '</li>';
-                $footer .= "\n" . '   <li id="pageURI">' . $this->config['current_page_url'] . '</li>';
-                $footer .= "\n" . '   <li id="baseURI">' . $this->config['base_page_url'] . '</li>';
-                $footer .= "\n" . '   <li id="subjectID">' . urlencode($this->config['product_id']) . '</li>';
-                $footer .= "\n" . '   <li id="contentType">' . mb_strtoupper($this->config['bv_product']) . '</li>';
-                $footer .= "\n" . '   <li id="subjectType">' . mb_strtoupper($this->config['subject_type']) . '</li>';
-                $footer .= "\n" . '   <li id="seo.sdk.charset">' . $this->config['charset'] . '</li>';
-                $footer .= "\n" . '   <li id="contentURL">' . $this->seo_url . '</li>';
-                $footer .= "\n" . '</ul>';
-            }
-        }
-
         return $footer;
-        // return "\n".'<!--BVSEO|dp: '.$this->config['deployment_zone_id'].'|sdk: v1.0-p|msg: '.$msg.' -->';
     }
 
     private function _booleanToString($boolean)
