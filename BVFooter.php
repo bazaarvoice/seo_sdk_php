@@ -80,7 +80,7 @@ class BVFooter
         $ssl_enabled = !empty($this->base->config['ssl_enabled']) ? 'TRUE' : 'FALSE';
         $proxy_host = !empty($this->base->config['proxy_host']) ? $this->base->config['proxy_host'] : 'none';
         $proxy_port = !empty($this->base->config['proxy_port']) ? $this->base->config['proxy_port'] : '0';
-        $local_seo_file_root = ($this->base->config['load_seo_files_locally']) ? $this->base->config['local_seo_file_root'] : 'FALSE';
+        $local_seo_file_root = (!empty($this->base->config['load_seo_files_locally'])) ? $this->base->config['local_seo_file_root'] : 'FALSE';
         $content_type = mb_strtoupper($this->base->config['content_type']);
         $subject_type = mb_strtoupper($this->base->config['subject_type']);
 
