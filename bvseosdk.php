@@ -614,7 +614,7 @@ class Base
     private function _buildComment($access_method)
     {
         $footer = '<ul id="BVSEOSDK" style="display:none;">';
-        $footer .= "\n" . '	<li id="vn">bvseo-1.0.1.8-beta</li>';
+        $footer .= "\n" . '	<li id="vn">bvseo-1.0.1.8</li>';
         $footer .= "\n" . '	<li id="sl">bvseo-p</li>';
         if (!empty($this->config['internal_file_path'])) {
             $footer .= "\n" . '	<li id="mt">bvseo-FILE</li>';
