@@ -52,7 +52,7 @@ class BVFooter
         $content_type = mb_strtoupper($this->base->config['content_type']);
         $subject_type = mb_strtoupper($this->base->config['subject_type']);
 
-        $footer  = "\n" . '<ul id="BVSEOSDK" style="display:none!important;">';
+        $footer  = "\n" . '<ul id="BVSEOSDK" style="display:none !important;">';
         $footer .= "\n" . '   <li data-bvseo="sdk">bvseo, net_sdk, ' . self::VERSION . '</li>';
         $footer .= "\n" . '   <li data-bvseo="sp_mt">' . $access_method . ', ' . $method_type . ', ' . $exec_time . 'ms</li>';
         $footer .= "\n" . '   <li data-bvseo="ct_st">' . $content_type . ', ' . $subject_type . '</li>';
