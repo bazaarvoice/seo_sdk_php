@@ -322,7 +322,8 @@ class Base
     protected function _renderSEO($access_method)
     {
         $pay_load = '';
-
+        $this->start_time = microtime(1);
+        
         $isBot = $this->_isBot();
 
         if (!$isBot && $this->config['latency_timeout'] == 0) {
@@ -335,7 +336,7 @@ class Base
             }
 
             try {
-                BVUtility::execTimer($this->config['latency_timeout'], $isBot);
+                BVUtility::execTimer($this->config['latency_timeout'], $isBot, $this->start_time);
                 $pay_load = $this->_getFullSeoContents($access_method);
             } catch (Exception $e) {
                 $this->_setBuildMessage($e->getMessage());

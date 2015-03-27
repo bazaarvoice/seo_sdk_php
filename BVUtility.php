@@ -35,11 +35,13 @@ class BVUtility
      * @param int ($exec_time_ms) - execution time in ms
      * @param bool ($is_bot) - shows the mode in which script was run
      */
-    public function execTimer($exec_time_ms, $is_bot = false)
+    public static function execTimer($exec_time_ms, $is_bot = false, $start = 0)
     {
         $exec_time = $exec_time_ms / 1000;
         declare(ticks = 1); // or more if 1 takes too much time
-        $start = microtime(1);
+        if (empty($start)) {
+            $start = microtime(1);
+        }
         register_tick_function('tick_timer', $start, $exec_time, $is_bot);
     }
 
@@ -50,7 +52,7 @@ class BVUtility
      *
      * @access public
      */
-    public function stopTimer()
+    public static function stopTimer()
     {
         unregister_tick_function('tick_timer');
     }
