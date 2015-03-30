@@ -15,7 +15,7 @@ function tick_timer($start, $exec_time, $is_bot)
     if ((microtime(1) - $start) > $exec_time) {
         if ($once) {
             $once = false;
-            throw new \Exception('Execution timed out' . ($is_bot ? ' for search bot' : '') . ', exceeded {' . $exec_time * 1000 . '}ms;');
+            throw new \Exception('Execution timed out' . ($is_bot ? ' for search bot' : '') . ', exceeded ' . $exec_time * 1000 . 'ms');
         }
     }
 }
