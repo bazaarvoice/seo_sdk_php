@@ -54,6 +54,7 @@ define('DEFAULT_CHARSET', 'UTF-8');
  *   Optional fields
  *      current_page_url (string) (defaults to detecting the current_page automatically)
  *      staging (boolean) (defaults to false, need to put true for testing with staging data)
+ *      testing (boolean) (defaults to false, need to put true for testing with testing data)
  *      subject_type (string) (defaults to product, for questions you can pass in categories here if needed)
  *      content_sub_type (string) (defaults to stories, for stories you can pass either STORIES_LIST or STORIES_GRID content type)
  *      execution_timeout (int) (in milliseconds) (defaults to 500ms, to set period of time before the BVSEO injection times out for user agents that do not match the criteria set in CRAWLER_AGENT_PATTERN)
@@ -86,6 +87,7 @@ class BV
         // config array, defaults are defined here
         $this->config = array(
             'staging' => FALSE,
+            'testing' => FALSE,
             'subject_type' => 'product',
             //get the current page url passed in as a "parameter"
             'current_page_url' => isset($params['current_page_url']) ? $params['current_page_url'] : "",
@@ -167,6 +169,8 @@ class Base
         // setup bv (internal) defaults
         $this->bv_config['seo-domain']['staging'] = 'seo-stg.bazaarvoice.com';
         $this->bv_config['seo-domain']['production'] = 'seo.bazaarvoice.com';
+        $this->bv_config['seo-domain']['testing_staging'] = 'seo-qa-stg.bazaarvoice.com';
+        $this->bv_config['seo-domain']['testing_production'] = 'seo-qa.bazaarvoice.com';
 
         $this->config['latency_timeout'] = $this->_isBot()
                 ? $this->config['execution_timeout_bot']
@@ -457,11 +461,18 @@ class Base
      */
     private function _buildSeoUrl($page_number)
     {
-        // are we pointing at staging or production?
-        if ($this->config['staging']) {
-            $hostname = $this->bv_config['seo-domain']['staging'];
+        if ($this->config['testing']) {
+            if ($this->config['staging']) {
+                $hostname = $this->bv_config['seo-domain']['testing_staging'];
+            } else {
+                $hostname = $this->bv_config['seo-domain']['testing_production'];
+            }
         } else {
-            $hostname = $this->bv_config['seo-domain']['production'];
+            if ($this->config['staging']) {
+                $hostname = $this->bv_config['seo-domain']['staging'];
+            } else {
+                $hostname = $this->bv_config['seo-domain']['production'];
+            }
         }
 
         $url_scheme = $this->config['ssl_enabled'] ? 'https://' : 'http://';
@@ -485,7 +496,7 @@ class Base
         // if our SEO content source is a file path
         // we need to remove the first two sections
         // and prepend the passed in file path
-        if ($this->config['internal_file_path']) {
+        if (isset($this->config['internal_file_path']) && !empty($this->config['internal_file_path'])) {
             unset($url_parts[0]);
             unset($url_parts[1]);
 
@@ -498,7 +509,7 @@ class Base
 
     private function _fetchSeoContent($resource)
     {
-        if (!empty($this->config['internal_file_path'])) {
+        if (isset($this->config['internal_file_path']) && !empty($this->config['internal_file_path'])) {
             return $this->_fetchFileContent($resource);
         } else {
             return $this->_fetchCloudContent($resource);
@@ -618,7 +629,7 @@ class Base
         $footer = '<ul id="BVSEOSDK" style="display:none;">';
         $footer .= "\n" . '	<li id="vn">bvseo-1.0.1.8</li>';
         $footer .= "\n" . '	<li id="sl">bvseo-p</li>';
-        if (!empty($this->config['internal_file_path'])) {
+        if (isset($this->config['internal_file_path'])) {
             $footer .= "\n" . '	<li id="mt">bvseo-FILE</li>';
         } else {
             $footer .= "\n" . '	<li id="mt">bvseo-CLOUD</li>';
