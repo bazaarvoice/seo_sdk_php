@@ -178,7 +178,8 @@ class Base
      */
     protected function _setBuildMessage($msg)
     {
-        $this->msg .= $msg . '; ';
+        $msg = rtrim($msg, ";");
+        $this->msg .= ' ' . $msg . ';';
     }
 
     /**
@@ -627,7 +628,7 @@ class Base
         }
         $footer .= "\n" . '	<li id="ct">bvseo-' . mb_strtoupper($this->config['bv_product']) . '</li>';
         $footer .= "\n" . '	<li id="st">bvseo-' . mb_strtoupper($this->config['subject_type']) . '</li>';
-        $footer .= "\n" . "	<li id='am'>bvseo-$access_method</li>";
+        $footer .= "\n" . '	<li id="am">bvseo-$access_method</li>';
         if (mb_strlen($this->msg) > 0) {
             $footer .= "\n" . '	<li id="ms">bvseo-msg: ' . $this->msg . '</li>';
         }
@@ -644,8 +645,6 @@ class Base
                 $staging = ($this->config['staging']) ? 'TRUE' : 'FALSE';
                 $footer .= "\n" . '   <li id="staging">' . $staging . '</li>';
                 $footer .= "\n" . '   <li id="seo.sdk.execution.timeout">' . $this->config['latency_timeout'] . '</li>';
-                $bot_detection = ($this->config['bot_detection']) ? 'TRUE' : 'FALSE';
-                $footer .= "\n" . '   <li id="botDetection">' . $bot_detection . '</li>';
                 $footer .= "\n" . '   <li id="crawlerAgentPattern">' . $this->config['bot_list'] . '</li>';
                 $footer .= "\n" . '   <li id="userAgent">' . $_SERVER['HTTP_USER_AGENT'] . '</li>';
                 $footer .= "\n" . '   <li id="pageURI">' . $this->config['current_page_url'] . '</li>';
