@@ -629,7 +629,7 @@ class Base
         $footer = '<ul id="BVSEOSDK" style="display:none;">';
         $footer .= "\n" . '	<li id="vn">bvseo-1.0.1.8</li>';
         $footer .= "\n" . '	<li id="sl">bvseo-p</li>';
-        if (isset($this->config['internal_file_path'])) {
+        if (isset($this->config['internal_file_path']) && !empty($this->config['internal_file_path'])) {
             $footer .= "\n" . '	<li id="mt">bvseo-FILE</li>';
         } else {
             $footer .= "\n" . '	<li id="mt">bvseo-CLOUD</li>';
