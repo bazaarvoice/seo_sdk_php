@@ -324,7 +324,7 @@ class Base
     {
         $pay_load = '';
         $this->start_time = microtime(1);
-        
+
         $isBot = $this->_isBot();
 
         if (!$isBot && $this->config['latency_timeout'] == 0) {
@@ -628,7 +628,7 @@ class Base
         }
         $footer .= "\n" . '	<li id="ct">bvseo-' . mb_strtoupper($this->config['bv_product']) . '</li>';
         $footer .= "\n" . '	<li id="st">bvseo-' . mb_strtoupper($this->config['subject_type']) . '</li>';
-        $footer .= "\n" . '	<li id="am">bvseo-$access_method</li>';
+        $footer .= "\n" . '	<li id="am">bvseo-' . $access_method . '</li>';
         if (mb_strlen($this->msg) > 0) {
             $footer .= "\n" . '	<li id="ms">bvseo-msg: ' . $this->msg . '</li>';
         }
