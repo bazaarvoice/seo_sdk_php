@@ -30,6 +30,7 @@
  *
  */
 require_once 'BVUtility.php';
+require_once 'BVFooter.php';
 
 // Should be declared in file where _execTimer will be used.
 // If declared in the another file it does not affect the current file.
@@ -447,6 +448,7 @@ class Base
             $seo_param = mb_ereg_replace('/', '\/', $bvparam); // need to escape slashes for regex
             $this->config['base_page_url'] = mb_ereg_replace('[?&]bvrrp=' . $seo_param, '', $this->config['base_page_url']);
         }
+        $this->config['page'] = $page_number;
 
         return $page_number;
     }
