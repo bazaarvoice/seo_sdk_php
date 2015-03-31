@@ -17,7 +17,7 @@ class SpotlightsTest extends PHPUnit_Framework_testCase
      */
     public function testSpotlights()
     {
-        $_SERVER['HTTP_USER_AGENT'] = "google";
+        $_SERVER['HTTP_USER_AGENT'] = 'google';
         $_GET['bvreveal'] = 'debug';
 
         $bv = new BV(array(

@@ -7,7 +7,7 @@ $bv = new BV(array(
     'product_id' => '',
     'cloud_key' => '',
     'current_page_url' => '',
-        ));
+));
 ?><!DOCTYPE html>
 <html>
     <head>

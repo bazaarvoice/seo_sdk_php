@@ -261,9 +261,9 @@ class Base
                     . 'Enable by setting seo.sdk.enabled to true.');
         }
 
-        $pay_load = $seo_content;
+        $payload = $seo_content;
 
-        return $pay_load;
+        return $payload;
     }
 
     private function _replaceSection($str, $search_str_begin, $search_str_end)
@@ -288,33 +288,33 @@ class Base
 
     protected function _renderAggregateRating()
     {
-        $pay_load = $this->_renderSEO('getAggregateRating');
+        $payload = $this->_renderSEO('getAggregateRating');
 
         if ($this->_isBot()) {
             // remove reviews section from full_contents
-            $pay_load = $this->_replaceSection($pay_load, '<!--begin-reviews-->', '<!--end-reviews-->');
+            $payload = $this->_replaceSection($payload, '<!--begin-reviews-->', '<!--end-reviews-->');
 
             // remove pagination section from full contents
-            $pay_load = $this->_replaceSection($pay_load, '<!--begin-pagination-->', '<!--end-pagination-->');
+            $payload = $this->_replaceSection($payload, '<!--begin-pagination-->', '<!--end-pagination-->');
         }
 
-        return $pay_load;
+        return $payload;
     }
 
     protected function _renderReviews()
     {
-        $pay_load = $this->_renderSEO('getReviews');
+        $payload = $this->_renderSEO('getReviews');
 
         if ($this->_isBot()) {
             // remove aggregate rating section from full_contents
-            $pay_load = $this->_replaceSection($pay_load, '<!--begin-aggregate-rating-->', '<!--end-aggregate-rating-->');
+            $payload = $this->_replaceSection($payload, '<!--begin-aggregate-rating-->', '<!--end-aggregate-rating-->');
 
             // Remove schema.org product text from reviews if it exists
             $schema_org_text = "itemscope itemtype=\"http://schema.org/Product\"";
-            $pay_load = mb_ereg_replace($schema_org_text, '', $pay_load);
+            $payload = mb_ereg_replace($schema_org_text, '', $payload);
         }
 
-        return $pay_load;
+        return $payload;
     }
 
     /**
@@ -329,7 +329,7 @@ class Base
      */
     protected function _renderSEO($access_method)
     {
-        $pay_load = '';
+        $payload = '';
         $this->start_time = microtime(1);
 
         $isBot = $this->_isBot();
@@ -345,15 +345,15 @@ class Base
 
             try {
                 BVUtility::execTimer($this->config['latency_timeout'], $isBot, $this->start_time);
-                $pay_load = $this->_getFullSeoContents($access_method);
+                $payload = $this->_getFullSeoContents($access_method);
             } catch (Exception $e) {
                 $this->_setBuildMessage($e->getMessage());
             }
             BVUtility::stopTimer();
         }
 
-        $pay_load .= $this->_buildComment($access_method);
-        return $pay_load;
+        $payload .= $this->_buildComment($access_method);
+        return $payload;
     }
 
     // --------------------------------------------------------------------
@@ -719,12 +719,12 @@ class Reviews extends Base
 
     public function getContent()
     {
-        $pay_load = $this->_renderSEO('getContent');
+        $payload = $this->_renderSEO('getContent');
 
         // if they want to power display integration as well
         // then we need to include the JS integration code
         if ($this->config['include_display_integration_code']) {
-            $pay_load .= '
+            $payload .= '
                <script>
                    $BV.ui("rr", "show_reviews", {
                        productId: "' . $this->config['product_id'] . '"
@@ -733,7 +733,7 @@ class Reviews extends Base
            ';
         }
 
-        return $pay_load;
+        return $payload;
     }
 
 }
@@ -756,13 +756,13 @@ class Questions extends Base
 
     public function getContent()
     {
-        $pay_load = $this->_renderSEO('getContent');
+        $payload = $this->_renderSEO('getContent');
 
         // if they want to power display integration as well
         // then we need to include the JS integration code
         if ($this->config['include_display_integration_code']) {
 
-            $pay_load .= '
+            $payload .= '
                <script>
                    $BV.ui("qa", "show_questions", {
                        productId: "' . $this->config['product_id'] . '"
@@ -771,7 +771,7 @@ class Questions extends Base
            ';
         }
 
-        return $pay_load;
+        return $payload;
     }
 
 }
@@ -807,12 +807,12 @@ class Stories extends Base
 
     public function getContent()
     {
-        $pay_load = $this->_renderSeo('getContent');
+        $payload = $this->_renderSeo('getContent');
 
         // if they want to power display integration as well
         // then we need to include the JS integration code
         if ($this->config['include_display_integration_code']) {
-            $pay_load .= '
+            $payload .= '
                <script>
                    $BV.ui("su", "show_stories", {
                        productId: "' . $this->config['product_id'] . '"
@@ -821,7 +821,7 @@ class Stories extends Base
            ';
         }
 
-        return $pay_load;
+        return $payload;
     }
 
 }
@@ -858,21 +858,7 @@ class Spotlights extends Base
 
     public function getContent()
     {
-        $pay_load = $this->_renderSEO('getContent');
-
-        // if they want to power display integration as well
-        // then we need to include the JS integration code
-        if ($this->config['include_display_integration_code']) {
-            $pay_load .= '
-               <script>
-                   $BV.ui("sl", "show_spotlights", {
-                       productId: "' . $this->config['product_id'] . '"
-                   });
-               </script>
-           ';
-        }
-
-        return $pay_load;
+        return $this->_renderSEO('getContent');
     }
 
 }
