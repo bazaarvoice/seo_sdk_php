@@ -118,6 +118,9 @@ class BV
         // setup the stories object
         $this->stories = new Stories($this->config);
 
+        // setup the spotlights object
+        $this->spotlights = new Spotlights($this->config);
+
         // setup the timer object
     }
 
@@ -627,7 +630,7 @@ class Base
     private function _buildComment($access_method)
     {
         $footer = '<ul id="BVSEOSDK" style="display:none;">';
-        $footer .= "\n" . '	<li id="vn">bvseo-1.0.1.8</li>';
+        $footer .= "\n" . '	<li id="vn">bvseo-2.2.0.1</li>';
         $footer .= "\n" . '	<li id="sl">bvseo-p</li>';
         if (isset($this->config['internal_file_path']) && !empty($this->config['internal_file_path'])) {
             $footer .= "\n" . '	<li id="mt">bvseo-FILE</li>';
@@ -824,4 +827,56 @@ class Stories extends Base
 }
 // end of Stories class
 
-// end of bvsdk.php
+class Spotlights extends Base
+{
+
+    function __construct($params = array())
+    {
+        // call Base Class constructor
+        parent::__construct($params);
+
+        // since we are in the spotlights class
+        // we need to set the bv_product config
+        // to reviews so we get reviews in our
+        // SEO request
+        $this->config['bv_product'] = 'spotlights';
+
+        // for spotlights subject type will always
+        // need to be category
+        $this->config['subject_type'] = 'category';
+    }
+
+    public function getAggregateRating()
+    {
+        return $this->_renderAggregateRating();
+    }
+
+    public function getReviews()
+    {
+        return $this->_renderReviews();
+    }
+
+    public function getContent()
+    {
+        $pay_load = $this->_renderSEO('getContent');
+
+        // if they want to power display integration as well
+        // then we need to include the JS integration code
+        if ($this->config['include_display_integration_code']) {
+            $pay_load .= '
+               <script>
+                   $BV.ui("sl", "show_spotlights", {
+                       productId: "' . $this->config['product_id'] . '"
+                   });
+               </script>
+           ';
+        }
+
+        return $pay_load;
+    }
+
+}
+// end of Spotlights class
+
+
+// end of bvseosdk.php
