@@ -41,7 +41,7 @@ class BVFooter
     public function buildSDKFooter()
     {
         //$access_method = !empty($this->base->config['load_seo_files_locally']) ? 'FILE' : 'CLOUD';
-        $access_method = !empty($this->base->config['internal_file_path']) ? 'FILE' : 'CLOUD';
+        $access_method = !empty($this->base->config['internal_file_path']) ? 'LOCAL' : 'CLOUD';
         $method_type = $this->method_type;
         $time_end = microtime(true);
 
@@ -56,7 +56,7 @@ class BVFooter
 
         $footer = "\n" . '<ul id="BVSEOSDK_meta" style="display:none !important;">';
         $footer .= "\n" . '   <li data-bvseo="sdk">bvseo_sdk, p_sdk, ' . self::VERSION . '</li>';
-        $footer .= "\n" . '   <li data-bvseo="sp_mt">' . $access_method . ', ' . $method_type . ', ' . $exec_time . 'ms</li>';
+        $footer .= "\n" . '   <li data-bvseo="sp_mt">' . $access_method . ', method:' . $method_type . ', ' . $exec_time . 'ms</li>';
         $footer .= "\n" . '   <li data-bvseo="ct_st">' . $content_type . ', ' . $subject_type . '</li>';
         if (!empty($this->msg)) {
             $footer .= "\n" . '   <li data-bvseo="ms">bvseo-msg: ' . $this->msg . '</li>';
