@@ -40,7 +40,7 @@ class BVFooter
      */
     public function buildSDKFooter()
     {
-        //$access_method = !empty($this->base->config['load_seo_files_locally']) ? 'FILE' : 'CLOUD';
+        //$access_method = !empty($this->base->config['load_seo_files_locally']) ? 'LOCAL' : 'CLOUD';
         $access_method = !empty($this->base->config['internal_file_path']) ? 'LOCAL' : 'CLOUD';
         $method_type = $this->method_type;
         $time_end = microtime(true);
