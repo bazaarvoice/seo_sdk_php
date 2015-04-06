@@ -22,8 +22,8 @@
  * require(bvsdk.php);
  *
  * $bv = new BV(array(
- *    'deployment_zone_id' => '1234-en_US',
- *    'product_id' => 'XXYYY',
+ *    'bv_root_folder' => '1234-en_US',
+ *    'subject_id' => 'XXYYY',
  *    'cloud_key' => 'company-cdfa682b84bef44672efed074093ccd3',
  *    'staging' => FALSE
  * ));
@@ -32,7 +32,7 @@
 require_once 'BVUtility.php';
 require_once 'BVFooter.php';
 
-// Should be declared in file where _execTimer will be used.
+// Should be declared in file where execTimer will be used.
 // If declared in the another file it does not affect the current file.
 declare(ticks = 1);
 
@@ -48,21 +48,22 @@ define('DEFAULT_CHARSET', 'UTF-8');
  * containing the following key value pairs.
  *
  *   Required fields:
- *      deployment_zone_id (string)
- *      product_id (string)
+ *      bv_root_folder (string)
+ *      subject_id (string)
  *      cloud_key (string)
  *
  *   Optional fields
- *      current_page_url (string) (defaults to detecting the current_page automatically)
+ *      base_url (string) (defaults to detecting the base_url automatically)
+ *      page_url (string) (defaults to empty, to provide query parameters )
  *      staging (boolean) (defaults to false, need to put true for testing with staging data)
  *      testing (boolean) (defaults to false, need to put true for testing with testing data)
- *      subject_type (string) (defaults to product, for questions you can pass in categories here if needed)
+ *      content_type (string) (defaults to reviews, you can pass content type here if needed)
+ *      subject_type (string) (defaults to product, you can pass subject type here if needed)
  *      content_sub_type (string) (defaults to stories, for stories you can pass either STORIES_LIST or STORIES_GRID content type)
  *      execution_timeout (int) (in milliseconds) (defaults to 500ms, to set period of time before the BVSEO injection times out for user agents that do not match the criteria set in CRAWLER_AGENT_PATTERN)
  *      execution_timeout_bot (int) (in milliseconds) (defaults to 2000ms, to set period of time before the BVSEO injection times out for user agents that match the criteria set in CRAWLER_AGENT_PATTERN)
  *      charset (string) (defaults to UTF-8, to set alternate character for SDK output)
- *      bv_product (string) (defaults to reviews)
- *      bot_list (string) (defaults to msnbot|googlebot|teoma|bingbot|yandexbot|yahoo)
+ *      crawler_agent_pattern (string) (defaults to msnbot|googlebot|teoma|bingbot|yandexbot|yahoo)
  */
 class BV
 {
@@ -79,9 +80,9 @@ class BV
     public function __construct($params = array())
     {
         // check to make sure we have the required parameters
-        if (empty($params) OR !$params['deployment_zone_id'] OR !$params['product_id']) {
+        if (empty($params) OR !$params['bv_root_folder'] OR !$params['subject_id']) {
             throw new Exception('BV Class missing required parameters.
-             BV expects an array with the following indexes: deployment_zone_id (string) and product_id
+             BV expects an array with the following indexes: bv_root_folder (string) and subject_id
              (string). ');
         }
 
@@ -89,15 +90,16 @@ class BV
         $this->config = array(
             'staging' => FALSE,
             'testing' => FALSE,
-            'subject_type' => 'product',
-            //get the current page url passed in as a "parameter"
-            'current_page_url' => isset($params['current_page_url']) ? $params['current_page_url'] : "",
-            'base_page_url' => $this->_getCurrentUrl(),
+            'content_type' => isset($params['content_type']) ? $params['content_type'] : 'reviews',
+            'subject_type' => isset($params['subject_type']) ? $params['subject_type'] : 'product',
+            'page_url' => isset($params['page_url']) ? $params['page_url'] : '',
+            'base_url' => $this->_getCurrentUrl(),
             'include_display_integration_code' => FALSE,
-            'client_name' => $params['deployment_zone_id'],
-            'internal_file_path' => FALSE,
+            'client_name' => $params['bv_root_folder'],
+            'local_seo_file_root' => '',
+            'load_seo_files_locally' => FALSE,
             // used in regex to determine if request is a bot or not
-            'bot_list' => 'msnbot|google|teoma|bingbot|yandexbot|yahoo',
+            'crawler_agent_pattern' => 'msnbot|google|teoma|bingbot|yandexbot|yahoo',
             'ssl_enabled' => FALSE,
             'proxy_host' => '',
             'proxy_port' => '',
@@ -155,9 +157,16 @@ class BV
 }
 // end of BV class
 
-// Most shared functionality is here so when we add support for questions
-// and answers it should be minimal changes. Just need to create an answers
-// class which inherits from Base.
+/**
+ * Base Class
+ *
+ * Class contains most shared functionality. So when we add support for questions
+ * and answers it should be minimal changes. Just need to create an answers
+ * class which inherits from Base.
+ *
+ * Configuration array is required for creation class object.
+ *
+ */
 class Base
 {
     private $msg = '';
@@ -234,7 +243,10 @@ class Base
         return $seo_content;
     }
 
-    private function _getFullSeoContents($access_method)
+    /**
+     * Return full SEO content.
+     */
+    private function _getFullSeoContents()
     {
         $seo_content = '';
 
@@ -267,6 +279,9 @@ class Base
         return $payload;
     }
 
+    /**
+     * Remove predefined section from a string.
+     */
     private function _replaceSection($str, $search_str_begin, $search_str_end)
     {
         $result = $str;
@@ -287,6 +302,9 @@ class Base
         return $result;
     }
 
+    /**
+     * Get only aggregate rating from SEO content.
+     */
     protected function _renderAggregateRating()
     {
         $payload = $this->_renderSEO('getAggregateRating');
@@ -302,6 +320,9 @@ class Base
         return $payload;
     }
 
+    /**
+     * Get only reviews from SEO content.
+     */
     protected function _renderReviews()
     {
         $payload = $this->_renderSEO('getReviews');
@@ -377,7 +398,7 @@ class Base
         }
 
         // search the user agent string for an indication if this is a search bot or not
-        return mb_eregi('(' . $this->config['bot_list'] . ')', $_SERVER['HTTP_USER_AGENT']);
+        return mb_eregi('(' . $this->config['crawler_agent_pattern'] . ')', $_SERVER['HTTP_USER_AGENT']);
     }
 
     /**
@@ -393,9 +414,9 @@ class Base
         // default to page 1 if a page is not specified in the URL
         $page_number = 1;
 
-        if (!empty($this->config['current_page_url'])) {
-            //parse the current url that's passed in via the parameters
-            $currentUrlArray = parse_url($this->config['current_page_url']);
+        if (!empty($this->config['page_url'])) {
+            //parse the page url that's passed in via the parameters
+            $currentUrlArray = parse_url($this->config['page_url']);
 
             $query = $currentUrlArray['path']; //get the path out of the parsed url array
 
@@ -408,7 +429,7 @@ class Base
 
             // remove the bvpage parameter from the base URL so we don't keep appending it
             $seo_param = mb_ereg_replace('/', '\/', $_GET['bvrrp']); // need to escape slashes for regex
-            $this->config['base_page_url'] = mb_ereg_replace('[?&]bvrrp=' . $seo_param, '', $this->config['base_page_url']);
+            $this->config['base_url'] = mb_ereg_replace('[?&]bvrrp=' . $seo_param, '', $this->config['base_url']);
         }
         // other implementations use the bvrrp, bvqap, or bvsyp parameter ?bvrrp=1234-en_us/reviews/product/2/ASF234.htm
         else if (isset($_GET['bvrrp']) OR isset($_GET['bvqap']) OR isset($_GET['bvsyp'])) {
@@ -426,7 +447,7 @@ class Base
                 $bvparam = $bvcurrentpagedata['bvpage'];
                 // remove the bvpage parameter from the base URL so we don't keep appending it
                 $seo_param = mb_ereg_replace('/', '\/', $_GET['bvrrp']); // need to escape slashses for regex
-                $this->config['base_page_url'] = mb_ereg_replace('[?&]bvrrp=' . $seo_param, '', $this->config['base_page_url']);
+                $this->config['base_url'] = mb_ereg_replace('[?&]bvrrp=' . $seo_param, '', $this->config['base_url']);
             }
             // other implementations use the bvrrp, bvqap, or bvsyp parameter ?bvrrp=1234-en_us/reviews/product/2/ASF234.htm
             else if (isset($bvcurrentpagedata['bvrrp']) || isset($bvcurrentpagedata['bvqap']) || isset($bvcurrentpagedata['bvsyp'])) {
@@ -446,7 +467,7 @@ class Base
 
             // remove the bvrrp parameter from the base URL so we don't keep appending it
             $seo_param = mb_ereg_replace('/', '\/', $bvparam); // need to escape slashes for regex
-            $this->config['base_page_url'] = mb_ereg_replace('[?&]bvrrp=' . $seo_param, '', $this->config['base_page_url']);
+            $this->config['base_url'] = mb_ereg_replace('[?&]bvrrp=' . $seo_param, '', $this->config['base_url']);
         }
         $this->config['page'] = $page_number;
 
@@ -486,8 +507,8 @@ class Base
         $url_parts = array(
             $url_scheme . $hostname,
             $this->config['cloud_key'],
-            $this->config['deployment_zone_id'],
-            $this->config['bv_product'],
+            $this->config['bv_root_folder'],
+            $this->config['content_type'],
             $this->config['subject_type'],
             $page_number
         );
@@ -496,25 +517,28 @@ class Base
             $url_parts[] = $this->config['content_sub_type'];
         }
 
-        $url_parts[] = urlencode($this->config['product_id']) . '.htm';
+        $url_parts[] = urlencode($this->config['subject_id']) . '.htm';
 
         // if our SEO content source is a file path
         // we need to remove the first two sections
         // and prepend the passed in file path
-        if (isset($this->config['internal_file_path']) && !empty($this->config['internal_file_path'])) {
+        if (!empty($this->config['load_seo_files_locally']) && !empty($this->config['local_seo_file_root'])) {
             unset($url_parts[0]);
             unset($url_parts[1]);
 
-            return $this->config['internal_file_path'] . implode("/", $url_parts);
+            return $this->config['local_seo_file_root'] . implode("/", $url_parts);
         }
 
         // implode will convert array to a string with / in between each value in array
         return implode("/", $url_parts);
     }
 
+    /**
+     * Return a SEO content from local or distant sourse.
+     */
     private function _fetchSeoContent($resource)
     {
-        if (isset($this->config['internal_file_path']) && !empty($this->config['internal_file_path'])) {
+        if ($this->config['load_seo_files_locally']) {
             return $this->_fetchFileContent($resource);
         } else {
             return $this->_fetchCloudContent($resource);
@@ -529,12 +553,18 @@ class Base
      *
      * @access private
      * @param string (valid file path)
-     * @return string (contents of file)
+     * @return string (content of file)
      */
     private function _fetchFileContent($path)
     {
-        $this->_setBuildMessage('Local file content was uploaded');
-        return file_get_contents($path);
+        $file = file_get_contents($path);
+        if ($file === FALSE) {
+            $this->_setBuildMessage('Trying to get content from ' . $path
+                    . '. The resource file is currently unavailable');
+        } else {
+            $this->_setBuildMessage('Local file content was uploaded');
+        }
+        return $file;
     }
 
     /**
@@ -616,7 +646,7 @@ class Base
     private function _replaceTokens($content)
     {
         // determine if query string exists in current page url
-        if (parse_url($this->config['base_page_url'], PHP_URL_QUERY) != '') {
+        if (parse_url($this->config['base_url'], PHP_URL_QUERY) != '') {
             // append an ampersand, because the URL already has a ? mark
             $page_url_query_prefix = '&';
         } else {
@@ -624,11 +654,14 @@ class Base
             $page_url_query_prefix = '?';
         }
 
-        $content = mb_ereg_replace('{INSERT_PAGE_URI}', $this->config['base_page_url'] . $page_url_query_prefix, $content);
+        $content = mb_ereg_replace('{INSERT_PAGE_URI}', $this->config['base_url'] . $page_url_query_prefix, $content);
 
         return $content;
     }
 
+    /**
+     * Return hidden metadata for adding to SEO content.
+     */
     private function _buildComment($access_method)
     {
         $bvf = new BVFooter($this, $access_method, $this->msg);
@@ -651,6 +684,11 @@ class Base
 }
 // end of Base class
 
+/**
+ * Reviews Class
+ *
+ * Base class extention for work with "reviews" content type.
+ */
 class Reviews extends Base
 {
 
@@ -660,10 +698,10 @@ class Reviews extends Base
         parent::__construct($params);
 
         // since we are in the reviews class
-        // we need to set the bv_product config
+        // we need to set the content_type config
         // to reviews so we get reviews in our
         // SEO request
-        $this->config['bv_product'] = 'reviews';
+        $this->config['content_type'] = 'reviews';
 
         // for reviews subject type will always
         // need to be product
@@ -690,7 +728,7 @@ class Reviews extends Base
             $payload .= '
                <script>
                    $BV.ui("rr", "show_reviews", {
-                       productId: "' . $this->config['product_id'] . '"
+                       productId: "' . $this->config['subject_id'] . '"
                    });
                </script>
            ';
@@ -702,6 +740,11 @@ class Reviews extends Base
 }
 // end of Reviews class
 
+/**
+ * Questions Class
+ *
+ * Base class extention for work with "questions" content type.
+ */
 class Questions extends Base
 {
 
@@ -711,10 +754,10 @@ class Questions extends Base
         parent::__construct($params);
 
         // since we are in the questions class
-        // we need to set the bv_product config
+        // we need to set the content_type config
         // to questions so we get questions in our
         // SEO request
-        $this->config['bv_product'] = 'questions';
+        $this->config['content_type'] = 'questions';
     }
 
     public function getContent()
@@ -728,7 +771,7 @@ class Questions extends Base
             $payload .= '
                <script>
                    $BV.ui("qa", "show_questions", {
-                       productId: "' . $this->config['product_id'] . '"
+                       productId: "' . $this->config['subject_id'] . '"
                    });
                </script>
            ';
@@ -740,6 +783,11 @@ class Questions extends Base
 }
 // end of Questions class
 
+/**
+ * Stories Class
+ *
+ * Base class extention for work with "stories" content type.
+ */
 class Stories extends Base
 {
 
@@ -749,10 +797,10 @@ class Stories extends Base
         parent::__construct($params);
 
         // since we are in the stories class
-        // we need to set the bv_product config
+        // we need to set the content_type config
         // to stories so we get stories in our
         // SEO request
-        $this->config['bv_product'] = 'stories';
+        $this->config['content_type'] = 'stories';
 
         // for stories subject type will always
         // need to be product
@@ -761,7 +809,8 @@ class Stories extends Base
         // for stories we have to set content sub type
         // the sub type is configured as either STORIES_LIST or STORIES_GRID
         // the folder names are "stories" and "storiesgrid" respectively.
-        if (isset($this->config['content_sub_type']) && $this->config['content_sub_type'] == "stories_grid") {
+        if (isset($this->config['content_sub_type'])
+                && $this->config['content_sub_type'] == "stories_grid") {
             $this->config['content_sub_type'] = "storiesgrid";
         } else {
             $this->config['content_sub_type'] = "stories";
@@ -778,7 +827,7 @@ class Stories extends Base
             $payload .= '
                <script>
                    $BV.ui("su", "show_stories", {
-                       productId: "' . $this->config['product_id'] . '"
+                       productId: "' . $this->config['subject_id'] . '"
                    });
                </script>
            ';
@@ -799,10 +848,10 @@ class Spotlights extends Base
         parent::__construct($params);
 
         // since we are in the spotlights class
-        // we need to set the bv_product config
+        // we need to set the content_type config
         // to reviews so we get reviews in our
         // SEO request
-        $this->config['bv_product'] = 'spotlights';
+        $this->config['content_type'] = 'spotlights';
 
         // for spotlights subject type will always
         // need to be category

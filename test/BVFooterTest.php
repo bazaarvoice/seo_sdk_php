@@ -9,29 +9,24 @@ require_once 'test/config.php';
 class BVFooterTest extends PHPUnit_Framework_testCase
 {
     var $params = array(
-        //'bv_root_folder' => 'test',
-        'deployment_zone_id' => 'test',
-        //'subject_id' => 'test',
-        'product_id' => 'test',
+        'bv_root_folder' => 'test',
+        'subject_id' => 'test',
         'cloud_key' => 'test',
         'staging' => FALSE,
         'testing' => TRUE,
         'seo_sdk_enabled' => TRUE,
         'ssl_enabled' => TRUE,
-        //'crawler_agent_pattern' => 'msnbot|google|teoma|bingbot|yandexbot|yahoo',
-        'bot_list' => 'msnbot|google|teoma|bingbot|yandexbot|yahoo',
+        'crawler_agent_pattern' => 'msnbot|google|teoma|bingbot|yandexbot|yahoo',
         'bvreveal' => 'debug',
-        //'content_type' => 'product',
-        'bv_product' => 'product',
+        'content_type' => 'product',
         'subject_type' => 'category',
         'execution_timeout' => 300,
         'execution_timeout_bot' => 400,
         'charset' => 'UTF-8',
-        //'load_seo_files_locally' => FALSE,
-        //'local_seo_file_root' => '/test/local/file'
-        'internal_file_path' => '',
-        //'page_url' => '/page/url'
-        'current_page_url' => '/current/page/url'
+        'load_seo_files_locally' => FALSE,
+        'local_seo_file_root' => '/test/local/file',
+        'base_url' => '/base/url',
+        'page_url' => '/page/url'
     );
 
     /**
@@ -70,10 +65,8 @@ class BVFooterTest extends PHPUnit_Framework_testCase
                 . ' sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
         $base->seo_url = "test.com";
         $base->config['page'] = "2";
-        $base->config['base_page_url'] = "test.bv";
-        $base->config['current_page_url'] = "test.bv&debug=true";
-        //$base->config['base_url'] = "test.bv";
-        //$base->config['page_url'] = "test.bv&debug=true";
+        $base->config['base_url'] = "test.bv";
+        $base->config['page_url'] = "test.bv&debug=true";
 
         $bvFooter = new BVFooter($base, $access_method, $msg);
         $res = $bvFooter->buildSDKDebugFooter();

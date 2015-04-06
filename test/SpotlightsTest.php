@@ -21,8 +21,8 @@ class SpotlightsTest extends PHPUnit_Framework_testCase
         $_GET['bvreveal'] = 'debug';
 
         $bv = new BV(array(
-            'deployment_zone_id' => $this->deployment_zone_id,
-            'product_id' => $this->product_id,
+            'bv_root_folder' => $this->deployment_zone_id,
+            'subject_id' => $this->product_id,
             'cloud_key' => $this->cloud_key,
         ));
 
@@ -30,12 +30,10 @@ class SpotlightsTest extends PHPUnit_Framework_testCase
         $this->assertNotNull($content, "There should be content to proceed further assertion!!");
         $this->assertContains('seo.bazaarvoice.com/test/test/spotlights/category/1/test.htm', $content);
         $this->assertContains('getContent', $content);
-        
 
         $content = $bv->spotlights->getAggregateRating();
         $this->assertNotNull($content, "There should be content to proceed further assertion!!");
         $this->assertContains('getAggregateRating', $content);
-        
 
         $content = $bv->spotlights->getReviews();
         $this->assertNotNull($content, "There should be content to proceed further assertion!!");

@@ -22,15 +22,15 @@ class S3ContentTest extends PHPUnit_Framework_testCase
     }
 
     var $params = array(
-        'deployment_zone_id' => 'test',
-        'product_id' => 'test',
+        'bv_root_folder' => 'test',
+        'subject_id' => 'test',
         'cloud_key' => 'test',
         'staging' => TRUE,
         'testing' => TRUE,
-        'bot_list' => 'msnbot|google|teoma|bingbot|yandexbot|yahoo',
+        'crawler_agent_pattern' => 'msnbot|google|teoma|bingbot|yandexbot|yahoo',
         'ssl_enabled' => FALSE,
-        'bv_product' => 'product',
-        'subject_type' => 'category',
+        'content_type' => 'reviews',
+        'subject_type' => 'product',
         'execution_timeout' => 500,
         'execution_timeout_bot' => 2000
     );

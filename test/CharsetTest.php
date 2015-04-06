@@ -12,7 +12,7 @@ class CharsetTest extends PHPUnit_Framework_testCase
         'execution_timeout' => 5000,
         'execution_timeout_bot' => 5000,
         'bvreveal' => 'debug',
-        'bot_list' => 'msnbot|google|teoma|bingbot|yandexbot|yahoo',
+        'crawler_agent_pattern' => 'msnbot|google|teoma|bingbot|yandexbot|yahoo',
     );
 
     // Use reflection to test private methods
