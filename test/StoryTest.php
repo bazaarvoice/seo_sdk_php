@@ -6,7 +6,7 @@ require_once 'test/config.php';
 /**
  * Test class to test Stories.
  */
-class StoryTest extends PHPUnit_Framework_testCase
+class StoriesImplementingTest extends PHPUnit_Framework_testCase
 {
     public $cloud_key = 'myshco-3e3001e88d9c32d19a17cafacb81bec7';
     public $deployment_zone_id = '9344';

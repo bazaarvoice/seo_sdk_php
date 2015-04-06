@@ -6,7 +6,7 @@ require_once 'test/config.php';
 /**
  * Test class to test Spotlights.
  */
-class SpotlightsTest extends PHPUnit_Framework_testCase
+class SpotlightsImplementingTest extends PHPUnit_Framework_testCase
 {
     public $cloud_key = 'test';
     public $deployment_zone_id = 'test';

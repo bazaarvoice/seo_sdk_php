@@ -79,7 +79,7 @@ class BaseTest extends PHPUnit_Framework_testCase
     {
         // Stop here and mark this test as incomplete.
         $this->markTestIncomplete(
-                'This test will be compleated after the new footer implementing.'
+                'This test will be compleated after the implementing footer with new naming.'
         );
 
         $_SERVER['HTTP_USER_AGENT'] = "google";
