@@ -557,7 +557,7 @@ class Base
      */
     private function _fetchFileContent($path)
     {
-        $file = file_get_contents($path);
+        $file = @file_get_contents($path);
         if ($file === FALSE) {
             $this->_setBuildMessage('Trying to get content from ' . $path
                     . '. The resource file is currently unavailable');
@@ -565,6 +565,26 @@ class Base
             $this->_setBuildMessage('Local file content was uploaded');
         }
         return $file;
+    }
+    
+    public function curlExecute($ch)
+    {
+        return curl_exec($ch);
+    }
+
+    public function curlInfo($ch)
+    {
+        return curl_getinfo($ch);
+    }
+
+    public function curlErrorNo($ch)
+    {
+        return curl_errno($ch);
+    }
+
+    public function curlError($ch)
+    {
+        return curl_error($ch);
     }
 
     /**
@@ -607,10 +627,10 @@ class Base
         // request info, and error number
         // so we can use them later
         $request = array(
-            'response' => curl_exec($ch),
-            'info' => curl_getinfo($ch),
-            'error_number' => curl_errno($ch),
-            'error_message' => curl_error($ch)
+            'response' => $this->curlExecute($ch),
+            'info' => $this->curlInfo($ch),
+            'error_number' => $this->curlErrorNo($ch),
+            'error_message' => $this->curlError($ch)
         );
 
         // Close the cURL resource, and free system resources
@@ -672,13 +692,9 @@ class Base
         return $footer;
     }
 
-    private function _booleanToString($boolean)
+    public function getBVMessages()
     {
-        if ($boolean) {
-            return 'TRUE';
-        } else {
-            return 'FALSE';
-        }
+        return $this->msg;
     }
 
 }
