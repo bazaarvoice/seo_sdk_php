@@ -40,8 +40,8 @@ Parameter Name | Default value | Example Value(s) | Required | Notes
 bv_root_folder |  None | 1234-en_us | Yes | Unique root folders are created for each deployment zone and locale. |
 subject_id |  None | test1 | Yes | The subject ID needs to match the product ID you reference in your product data feed and use to power your display of UGC.|
 cloud_key |  None | 2b1d0e3b86ffa60cb2079dea11135c1e | Yes | Will be provided by your Bazaarvoice team.  |
-testing |  FALSE | TRUE or FALSE | No | If set TRUE the SDK will pull SEO content from QA server rather than production. |
-staging |  FALSE | TRUE or FALSE | No | If set TRUE the SDK will pull SEO content from staging rather than production. |
+testing |  FALSE | TRUE or FALSE | No | If set `TRUE` the SDK will pull SEO content from QA server rather than production. |
+staging |  FALSE | TRUE or FALSE | No | If set `TRUE` the SDK will pull SEO content from staging rather than production. |
 execution_timeout | 500 | 300 | No | Integer in ms. Period of time before the BVSEO injection times out for user agents that do not match the criteria set in `crawler_agent_pattern`. |
 execution_timeout_bot | 2000 | 1000 | No | Integer in ms. Period of time before the BVSEO injection times out for user agents that match the criteria set in `crawler_agent_pattern`. |
 base_url | Current page using $_SERVER |  http://www.example.com/pdp/test1 | No | If a base URL is not provided, the current page URL will be used instead. |
