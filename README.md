@@ -37,20 +37,21 @@ Follow these steps to use the PHP SDK:
 
 Parameter Name | Default value | Example Value(s) | Required | Notes
 ------------ | ------------- | ------------ | ------------ | ------------
-bv_root_folder |  None | 1234-en_us | Yes | Sometimes this is also referred to as your display code. |
+bv_root_folder |  None | 1234-en_us | Yes | Unique root folders are created for each deployment zone and locale. |
 subject_id |  None | test1 | Yes | The subject ID needs to match the product ID you reference in your product data feed and use to power your display of UGC.|
 cloud_key |  None | 2b1d0e3b86ffa60cb2079dea11135c1e | Yes | Will be provided by your Bazaarvoice team.  |
-staging |  TRUE | TRUE or FALSE | No | Toggle if the SDK should pull SEO content from staging or production. |
-execution_timeout | 500 | 300 | No | Integer in ms. Period of time before the BVSEO injection times out for user agents that do not match the criteria set in CRAWLER_AGENT_PATTERN. |
-execution_timeout_bot | 2000 | 1000 | No | Integer in ms. Period of time before the BVSEO injection times out for user agents that match the criteria set in CRAWLER_AGENT_PATTERN. |
+testing |  FALSE | TRUE or FALSE | No | If set TRUE the SDK will pull SEO content from QA server rather than production. |
+staging |  FALSE | TRUE or FALSE | No | If set TRUE the SDK will pull SEO content from staging rather than production. |
+execution_timeout | 500 | 300 | No | Integer in ms. Period of time before the BVSEO injection times out for user agents that do not match the criteria set in `crawler_agent_pattern`. |
+execution_timeout_bot | 2000 | 1000 | No | Integer in ms. Period of time before the BVSEO injection times out for user agents that match the criteria set in `crawler_agent_pattern`. |
 base_url | Current page using $_SERVER |  http://www.example.com/pdp/test1 | No | If a base URL is not provided, the current page URL will be used instead. |
-page_url | None |  http://www.example.com/pdp/test1?bvstate=pg:2/ct:r' | No | You will want to provide the URL if you use query parameters or # in your URLs that you don't want Google to index. |
-content_type | reviews | reviews, questions, stories, spotlights | No | You can pass content type here if needed. |
-subject_type | product | product, category, entry, detail | No | You can pass subject type here if needed. |
-content_sub_type | stories_list | stories_list, stories_grid | No | For stories you can pass either STORIES_LIST or STORIES_GRID content type. |
-crawler_agent_pattern | msnbot, googlebot, teoma, bingbot, yandexbot, yahoo | No | Any regex valid expression | Regular expression used to determine whether or not the current request is a bot (checking against user agent header) |
-include_display_integration_code |  FALSE | TRUE or FALSE | No | If you want the SDK to also include the JavaScript to power display as well.  You will need to include the bvapi.js file seperately.  |
-local_seo_file_root |  None | '/home/zip/smart_seo/ | No | Local file configurations are not recommended, but may be required to overcome system limitations. If you want the SDK to also include the JavaScript to power display as well.  You will need to include the bvapi.js file seperately.  |
-load_seo_file_locally |  FALSE | TRUE or FALSE | No | You will want load content from LOCAL_SEO_FILE_ROOT. Local file configurations are not recommended, but may be required to overcome system limitations. A local file system can be be fragile since Bazaarvoice is not responsible for the daily retrieval, unpacking, and distribution of SEO files. To enable local files, LOAD_SEO_FILES_LOCALLY and LOCAL_SEO_FILE_ROOT must be set.  |
+page_url | None |  http://www.example.com/pdp/test1?bvstate=pg:2/ct:r' | No | Provide the URL if using query parameters or fragments in your URLs that Google should not index. |
+content_type | reviews | reviews, questions, stories, spotlights | No | Provide the content type here if needed. |
+subject_type | product | product, category, entry, detail | No | Provide the subject type here if needed. |
+content_sub_type | stories_list | stories_list, stories_grid | No | If `content_type` is set to `stories` then pass either `stories_list` or `stories_grid` as the content subtype. |
+crawler_agent_pattern | msnbot, googlebot, teoma, bingbot, yandexbot, yahoo | `msnbot|google` | Provide a regular expression to check the user agent header value. This is used to determine whether or not the current request is made by a search engine crawler. |
+include_display_integration_code |  FALSE | TRUE or FALSE | No | Set `TRUE` to include the Javascript that powers the display. The `bvapi.js` file must be included separately. |
+local_seo_file_root |  None | '/home/zip/smart_seo/' | No | If using a local file configuration, provide the absolute path to the unzipped directory of Smart SEO content. |
+load_seo_file_locally |  FALSE | TRUE or FALSE | No | Set `TRUE` to load content from the local directory specified in `local_seo_file_root`. Local file configurations are not recommended, but may be required to overcome system limitations. A local file system can be be fragile since Bazaarvoice is not responsible for the daily retrieval, unpacking, and distribution of SEO files. To enable local files, both `load_seo_file_locally` and `local_seo_file_root` must be set.  |
 
 To run unit tests you should first install the [phpunit](https://phpunit.de/getting-started.html) tool. Then in the folder where the bvseosdk.php file is placed run `phpunit test` to execute all of the tests or `phpunit test/<testName>` to run a particular test.
