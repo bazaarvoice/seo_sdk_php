@@ -37,7 +37,7 @@ Follow these steps to use the PHP SDK:
 
 Parameter Name | Default value | Example Value(s) | Required | Notes
 ------------ | ------------- | ------------ | ------------ | ------------
-bv_root_folder |  None | 1234-en_us | Yes | Unique root folders are created for each deployment zone and locale. |
+bv_root_folder |  None | 1234-en_us | Yes | For PRR customers the root folder is the display code. For Conversations customers unique root folders are created for each deployment zone and locale. |
 subject_id |  None | test1 | Yes | The subject ID needs to match the product ID you reference in your product data feed and use to power your display of UGC.|
 cloud_key |  None | 2b1d0e3b86ffa60cb2079dea11135c1e | Yes | Will be provided by your Bazaarvoice team.  |
 testing |  FALSE | TRUE or FALSE | No | If set `TRUE` the SDK will pull SEO content from QA server rather than production. |
