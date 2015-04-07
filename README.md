@@ -45,7 +45,7 @@ staging |  FALSE | TRUE or FALSE | No | If set `TRUE` the SDK will pull SEO cont
 execution_timeout | 500 | 300 | No | Integer in ms. Period of time before the BVSEO injection times out for user agents that do not match the criteria set in `crawler_agent_pattern`. |
 execution_timeout_bot | 2000 | 1000 | No | Integer in ms. Period of time before the BVSEO injection times out for user agents that match the criteria set in `crawler_agent_pattern`. |
 base_url | Current page using $_SERVER |  http://www.example.com/pdp/test1 | No | If a base URL is not provided, the current page URL will be used instead. |
-page_url | None |  http://www.example.com/pdp/test1?bvstate=pg:2/ct:r' | No | Provide the URL if using query parameters or fragments in your URLs that Google should not index. |
+page_url | None |  http://www.example.com/pdp/test1?bvstate=pg:2/ct:r | No | Provide the URL if using query parameters or fragments in your URLs that Google should not index. |
 content_type | reviews | reviews, questions, stories, spotlights | No | Provide the content type here if needed. |
 subject_type | product | product, category, entry, detail | No | Provide the subject type here if needed. |
 content_sub_type | stories_list | stories_list, stories_grid | No | If `content_type` is set to `stories` then pass either `stories_list` or `stories_grid` as the content subtype. |
