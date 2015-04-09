@@ -3,10 +3,10 @@
 require('bvseosdk.php');
 
 $bv = new BV(array(
-    'deployment_zone_id' => '',
-    'product_id' => '',
+    'bv_root_folder' => '',
+    'subject_id' => '',
     'cloud_key' => '',
-    'current_page_url' => '',
+    'page_url' => '',
 ));
 ?><!DOCTYPE html>
 <html>

@@ -8,18 +8,9 @@ require_once 'test/config.php';
  */
 class BVTest extends PHPUnit_Framework_testCase
 {
-    var $params_old = array(
-        'deployment_zone_id' => 'test',
-        //'bv_root_folder' => 'test',
-        //'subject_id' => 'test',
-        'product_id' => 'test',
-        'cloud_key' => 'test',
-    );
-    var $params_new = array(
-        //'deployment_zone_id' => 'test',
+    var $params = array(
         'bv_root_folder' => 'test',
         'subject_id' => 'test',
-        //'product_id' => 'test',
         'cloud_key' => 'test',
     );
 
@@ -40,10 +31,9 @@ class BVTest extends PHPUnit_Framework_testCase
             'REQUEST_URI' => '/index.php?bvreveal=debug',
             'HTTP_USER_AGENT' => 'google',
         );
-        $obj = new BV($this->params_old);
+        $obj = new BV($this->params);
         $getCurrentUrl = self::getMethod($obj, '_getCurrentUrl');
         $res = $getCurrentUrl->invokeArgs($obj, array());
-        //echo $res;
 
         $this->assertEquals('https://localhost:80/index.php?bvreveal=debug', $res);
 
@@ -53,10 +43,9 @@ class BVTest extends PHPUnit_Framework_testCase
             'REQUEST_URI' => '/index.php?bvreveal=debug',
             'HTTP_USER_AGENT' => 'google',
         );
-        $obj = new BV($this->params_old);
+        $obj = new BV($this->params);
         $getCurrentUrl = self::getMethod($obj, '_getCurrentUrl');
         $res = $getCurrentUrl->invokeArgs($obj, array());
-        //echo $res;
 
         $this->assertEquals('http://localhost/index.php?bvreveal=debug', $res);
 
@@ -66,10 +55,10 @@ class BVTest extends PHPUnit_Framework_testCase
             'REQUEST_URI' => '/index.php?bvreveal=debug',
             'HTTP_USER_AGENT' => 'google',
         );
-        $obj = new BV($this->params_old);
+
+        $obj = new BV($this->params);
         $getCurrentUrl = self::getMethod($obj, '_getCurrentUrl');
         $res = $getCurrentUrl->invokeArgs($obj, array());
-        //echo $res;
 
         $this->assertEquals('http://localhost:88/index.php?bvreveal=debug', $res);
     }

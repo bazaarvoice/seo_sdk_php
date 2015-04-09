@@ -559,8 +559,8 @@ class Base
     {
         $file = @file_get_contents($path);
         if ($file === FALSE) {
-            $this->_setBuildMessage('Trying to get content from ' . $path
-                    . '. The resource file is currently unavailable');
+            $this->_setBuildMessage('Trying to get content from "' . $path
+                    . '". The resource file is currently unavailable');
         } else {
             $this->_setBuildMessage('Local file content was uploaded');
         }
@@ -610,7 +610,7 @@ class Base
         // Set URL to download
         curl_setopt($ch, CURLOPT_URL, $url);
         // Set a referer as coming from the current page url
-        curl_setopt($ch, CURLOPT_REFERER, $this->config['current_page_url']);
+        curl_setopt($ch, CURLOPT_REFERER, $this->config['page_url']);
         // Include header in result? (0 = yes, 1 = no)
         curl_setopt($ch, CURLOPT_HEADER, 0);
         // Should cURL return or print out the data? (true = return, false = print)

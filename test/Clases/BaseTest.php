@@ -8,63 +8,27 @@ require_once 'test/config.php';
  */
 class BaseTest extends PHPUnit_Framework_testCase
 {
-    // After implementing SEO-427 (PHP SDK Refactoring and Consistent Variable Naming)
-    // unit tests will be switched to $params_new
-    var $params_old = array(
-        'deployment_zone_id' => 'test',
-        //'bv_root_folder' => 'test',
-        //'subject_id' => 'test',
-        'product_id' => 'test',
-        'cloud_key' => 'test',
-        'staging' => FALSE,
-        'testing' => FALSE,
-        'bot_list' => 'msnbot|google|teoma|bingbot|yandexbot|yahoo',
-        //'crawler_agent_pattern' => 'msnbot|google|teoma|bingbot|yandexbot|yahoo',
-        'ssl_enabled' => FALSE,
-        'bv_product' => 'reviews',
-        //'content_type'=> 'product',
-        'subject_type' => 'category',
-        'execution_timeout' => 500,
-        'execution_timeout_bot' => 2000,
-        'internal_file_path' => '',
-        //'local_seo_file_root' => TRUE,
-        //'load_seo_files_locally' => '/load/seo/files/locally',
-        'seo_sdk_enabled' => TRUE,
-        'proxy_host' => '',
-        'proxy_port' => '',
-        'charset' => 'UTF-8',
-        'base_page_url' => '/base/url',
-        //'base_url' => '/base/url',
-        'current_page_url' => '/page/url&debug=true'
-            //'page_url' => '/page/url&debug=true'
-            //'include_display_integration_code' => FALSE,
-    );
-    var $params_new = array(
-        //'deployment_zone_id' => 'test',
+    var $params = array(
         'bv_root_folder' => 'test',
         'subject_id' => 'test',
-        //'product_id' => 'test',
         'cloud_key' => 'test',
         'staging' => FALSE,
         'testing' => FALSE,
-        //'bot_list' => 'msnbot|google|teoma|bingbot|yandexbot|yahoo',
         'crawler_agent_pattern' => 'msnbot|google|teoma|bingbot|yandexbot|yahoo',
         'ssl_enabled' => FALSE,
-        //'bv_product'=> 'product',
         'content_type' => 'reviews',
         'subject_type' => 'category',
         'execution_timeout' => 500,
         'execution_timeout_bot' => 2000,
-        //'internal_file_path' => '',
-        'local_seo_file_root' => TRUE,
-        'load_seo_files_locally' => '/load/seo/files/locally',
+        'local_seo_file_root' => '/load/seo/files/locally/',
+        'load_seo_files_locally' => FALSE,
         'seo_sdk_enabled' => TRUE,
         'proxy_host' => '',
         'proxy_port' => '',
         'charset' => 'UTF-8',
         'base_url' => '/base/url',
-        'page_url' => '/page/url&debug=true'
-            //'include_display_integration_code' => FALSE,
+        'page_url' => '/page/url&debug=true',
+        'include_display_integration_code' => TRUE,
     );
 
     protected static function getMethod($obj, $name)
@@ -77,19 +41,13 @@ class BaseTest extends PHPUnit_Framework_testCase
 
     public function test_buildComment()
     {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-                'This test will be compleated after the implementing footer with new naming.'
-        );
-
         $_SERVER['HTTP_USER_AGENT'] = "google";
         $_GET['bvreveal'] = 'debug';
-        $this->params_new['page'] = 5;
-        $obj = new Base($this->params_new);
+        $this->params['page'] = 5;
+        $obj = new Base($this->params);
         $buildComment = self::getMethod($obj, '_buildComment');
         $res = $buildComment->invokeArgs($obj, array("getContent"));
 
-        //echo $res;
         $this->assertContains('<li data-bvseo="staging">FALSE</li>', $res);
         $this->assertContains('<li data-bvseo="testing">FALSE</li>', $res);
         $this->assertContains('<li data-bvseo="seo.sdk.enabled">TRUE</li>', $res);
@@ -109,71 +67,73 @@ class BaseTest extends PHPUnit_Framework_testCase
         $_SERVER['HTTP_USER_AGENT'] = "google";
         $page_number = 5;
 
-        $this->params_old['testing'] = FALSE;
-        $this->params_old['staging'] = TRUE;
-        $obj = new Base($this->params_old);
+        $this->params['testing'] = FALSE;
+        $this->params['staging'] = TRUE;
+        $obj = new Base($this->params);
         $buildSeoUrl = self::getMethod($obj, '_buildSeoUrl');
         $res = $buildSeoUrl->invokeArgs($obj, array($page_number));
 
         $this->assertContains('http://seo-stg.bazaarvoice.com/test/test/reviews/category/5/test.htm', $res);
 
-        $this->params_old['testing'] = FALSE;
-        $this->params_old['staging'] = FALSE;
-        $obj = new Base($this->params_old);
+        $this->params['testing'] = FALSE;
+        $this->params['staging'] = FALSE;
+        $obj = new Base($this->params);
         $buildSeoUrl = self::getMethod($obj, '_buildSeoUrl');
         $res = $buildSeoUrl->invokeArgs($obj, array($page_number));
 
         $this->assertContains('http://seo.bazaarvoice.com/test/test/reviews/category/5/test.htm', $res);
 
-        $this->params_old['testing'] = TRUE;
-        $this->params_old['staging'] = TRUE;
-        $obj = new Base($this->params_old);
+        $this->params['testing'] = TRUE;
+        $this->params['staging'] = TRUE;
+        $obj = new Base($this->params);
         $buildSeoUrl = self::getMethod($obj, '_buildSeoUrl');
         $res = $buildSeoUrl->invokeArgs($obj, array($page_number));
 
         $this->assertContains('http://seo-qa-stg.bazaarvoice.com/test/test/reviews/category/5/test.htm', $res);
-        $this->params_old['testing'] = TRUE;
-        $this->params_old['staging'] = FALSE;
-        $obj = new Base($this->params_old);
+        $this->params['testing'] = TRUE;
+        $this->params['staging'] = FALSE;
+        $obj = new Base($this->params);
         $buildSeoUrl = self::getMethod($obj, '_buildSeoUrl');
         $res = $buildSeoUrl->invokeArgs($obj, array($page_number));
 
         $this->assertContains('http://seo-qa.bazaarvoice.com/test/test/reviews/category/5/test.htm', $res);
 
-        $this->params_old['testing'] = FALSE;
-        $this->params_old['staging'] = FALSE;
-        $this->params_old['ssl_enabled'] = FALSE;
-        $obj = new Base($this->params_old);
+        $this->params['testing'] = FALSE;
+        $this->params['staging'] = FALSE;
+        $this->params['ssl_enabled'] = FALSE;
+        $obj = new Base($this->params);
         $buildSeoUrl = self::getMethod($obj, '_buildSeoUrl');
         $res = $buildSeoUrl->invokeArgs($obj, array($page_number));
 
         $this->assertContains('http://seo.bazaarvoice.com/test/test/reviews/category/5/test.htm', $res);
 
-        $this->params_old['ssl_enabled'] = TRUE;
-        $obj = new Base($this->params_old);
+        $this->params['ssl_enabled'] = TRUE;
+        $obj = new Base($this->params);
         $buildSeoUrl = self::getMethod($obj, '_buildSeoUrl');
         $res = $buildSeoUrl->invokeArgs($obj, array($page_number));
 
         $this->assertContains('https://seo.bazaarvoice.com/test/test/reviews/category/5/test.htm', $res);
 
-        $this->params_old['ssl_enabled'] = FALSE;
-        $this->params_old['content_sub_type'] = "stories";
-        $obj = new Base($this->params_old);
+        $this->params['ssl_enabled'] = FALSE;
+        $this->params['content_sub_type'] = "stories";
+        $obj = new Base($this->params);
         $buildSeoUrl = self::getMethod($obj, '_buildSeoUrl');
         $res = $buildSeoUrl->invokeArgs($obj, array($page_number));
 
         $this->assertContains('http://seo.bazaarvoice.com/test/test/reviews/category/5/stories/test.htm', $res);
 
-        $this->params_old['content_sub_type'] = "storiesgrid";
-        $obj = new Base($this->params_old);
+        $this->params['content_sub_type'] = "storiesgrid";
+        $obj = new Base($this->params);
         $buildSeoUrl = self::getMethod($obj, '_buildSeoUrl');
         $res = $buildSeoUrl->invokeArgs($obj, array($page_number));
 
         $this->assertContains('http://seo.bazaarvoice.com/test/test/reviews/category/5/storiesgrid/test.htm', $res);
 
-        unset($this->params_old['content_sub_type']);
-        $this->params_old['internal_file_path'] = "/var/www/html/";
-        $obj = new Base($this->params_old);
+        unset($this->params['content_sub_type']);
+        $this->params['load_seo_files_locally'] = TRUE;
+        $this->params['local_seo_file_root'] = "/var/www/html/";
+
+        $obj = new Base($this->params);
         $buildSeoUrl = self::getMethod($obj, '_buildSeoUrl');
         $res = $buildSeoUrl->invokeArgs($obj, array($page_number));
 
@@ -183,9 +143,9 @@ class BaseTest extends PHPUnit_Framework_testCase
     public function test_charsetEncode()
     {
         $_SERVER['HTTP_USER_AGENT'] = "google";
-        $this->params_old['charset'] = 'Windows-1251';
+        $this->params['charset'] = 'Windows-1251';
 
-        $obj = new Base($this->params_old);
+        $obj = new Base($this->params);
         $charsetEncode = self::getMethod($obj, '_charsetEncode');
 
         $res = $charsetEncode->invokeArgs($obj, array("This is the Euro symbol 'в‚¬'"));
@@ -198,8 +158,8 @@ class BaseTest extends PHPUnit_Framework_testCase
     public function test_checkCharset()
     {
         $_SERVER['HTTP_USER_AGENT'] = "google";
-        $this->params_old['charset'] = 'NOT_EXISTING_CHARSET';
-        $obj = new Base($this->params_old);
+        $this->params['charset'] = 'NOT_EXISTING_CHARSET';
+        $obj = new Base($this->params);
         $checkCharset = self::getMethod($obj, '_checkCharset');
 
         $res = $checkCharset->invokeArgs($obj, array("Lorem ipsum dolor sit amet"));
@@ -207,10 +167,8 @@ class BaseTest extends PHPUnit_Framework_testCase
         //should be set UTF-8 as default charset
         $this->assertEquals("UTF-8", $obj->config['charset']);
 
-
-
-        $this->params_old['charset'] = 'SJIS';
-        $obj = new Base($this->params_old);
+        $this->params['charset'] = 'SJIS';
+        $obj = new Base($this->params);
         $checkCharset = self::getMethod($obj, '_checkCharset');
 
         $res = $checkCharset->invokeArgs($obj, array("Lorem ipsum dolor sit amet"));
@@ -222,9 +180,8 @@ class BaseTest extends PHPUnit_Framework_testCase
     public function test_fetchCloudContent()
     {
         $_SERVER['HTTP_USER_AGENT'] = "google";
-        $this->params_old['internal_file_path'] = '';
         $obj = $this->getMockBuilder('Base')
-                ->setConstructorArgs(array($this->params_old))
+                ->setConstructorArgs(array($this->params))
                 ->setMethods(['curlError', 'curlErrorNo', 'curlExecute', 'curlInfo'])
                 ->getMock();
         $obj->expects($this->any())
@@ -246,7 +203,7 @@ class BaseTest extends PHPUnit_Framework_testCase
         $fetchCloudContent = self::getMethod($obj, '_fetchCloudContent');
         $res = $fetchCloudContent->invokeArgs($obj, array($path));
         $this->assertEmpty($res);
-        //$this->assertContains("HTTP status code of 403 was returned", $obj->getBVMessages());
+        $this->assertContains("HTTP status code of 403 was returned", $obj->getBVMessages());
 
         $obj->expects($this->any())
                 ->method('curlInfo')
@@ -254,7 +211,7 @@ class BaseTest extends PHPUnit_Framework_testCase
 
 
         $obj = $this->getMockBuilder('Base')
-                ->setConstructorArgs(array($this->params_old))
+                ->setConstructorArgs(array($this->params))
                 ->setMethods(['curlError', 'curlErrorNo', 'curlExecute', 'curlInfo'])
                 ->getMock();
         $obj->expects($this->any())
@@ -282,31 +239,31 @@ class BaseTest extends PHPUnit_Framework_testCase
         $_SERVER['HTTP_USER_AGENT'] = "google";
         $path = 'test/data/universalSEO.html';
 
-        $obj = new Base($this->params_old);
+        $obj = new Base($this->params);
         $fetchFileContent = self::getMethod($obj, '_fetchFileContent');
 
         $res = $fetchFileContent->invokeArgs($obj, array($path));
 
         $this->assertContains("Content for unit tests", $res);
 
-        // Need @file_get_contents instead file_get_contents to work.
         $path = 'unexisting/test/path/universalSEO.html';
 
-        $obj = new Base($this->params_old);
+        $obj = new Base($this->params);
         $fetchFileContent = self::getMethod($obj, '_fetchFileContent');
 
         $res = $fetchFileContent->invokeArgs($obj, array($path));
 
         $this->assertFalse($res);
-        $this->assertContains("Local file content was uploaded", $obj->getBVMessages());
+        $this->assertContains('Trying to get content from "unexisting/test/path/universalSEO.html". The resource file is currently unavailable;', $obj->getBVMessages());
     }
 
     public function test_fetchSeoContent()
     {
         $_SERVER['HTTP_USER_AGENT'] = "google";
-        $this->params_old['internal_file_path'] = '';
+        $this->params['load_seo_files_locally'] = FALSE;
+
         $obj = $this->getMockBuilder('Base')
-                ->setConstructorArgs(array($this->params_old))
+                ->setConstructorArgs(array($this->params))
                 ->setMethods(['curlError', 'curlErrorNo', 'curlExecute', 'curlInfo'])
                 ->getMock();
         $obj->expects($this->any())
@@ -329,8 +286,8 @@ class BaseTest extends PHPUnit_Framework_testCase
 
         $this->assertContains("Mock content for unit tests.", $res);
 
-        $this->params_old['internal_file_path'] = 'www';
-        $obj = new Base($this->params_old);
+        $this->params['load_seo_files_locally'] = TRUE;
+        $obj = new Base($this->params);
         $fetchSeoContent = self::getMethod($obj, '_fetchSeoContent');
         $res = $fetchSeoContent->invokeArgs($obj, array($path));
 
@@ -340,9 +297,9 @@ class BaseTest extends PHPUnit_Framework_testCase
     public function test_getFullSeoContents()
     {
         $_SERVER['HTTP_USER_AGENT'] = "google";
-        $this->params_old['seo_sdk_enabled'] = TRUE;
+        $this->params['seo_sdk_enabled'] = TRUE;
         $obj = $this->getMockBuilder('Base')
-                ->setConstructorArgs(array($this->params_old))
+                ->setConstructorArgs(array($this->params))
                 ->setMethods(['curlError', 'curlErrorNo', 'curlExecute', 'curlInfo'])
                 ->getMock();
         $obj->expects($this->any())
@@ -366,9 +323,8 @@ class BaseTest extends PHPUnit_Framework_testCase
         $this->assertNotEmpty($res);
         $this->assertContains("Mock content for unit tests", $res);
 
-
-        $this->params_old['seo_sdk_enabled'] = FALSE;
-        $obj = new Base($this->params_old);
+        $this->params['seo_sdk_enabled'] = FALSE;
+        $obj = new Base($this->params);
         $getFullSeoContents = self::getMethod($obj, '_getFullSeoContents');
         $res = $getFullSeoContents->invokeArgs($obj, array("getContent"));
         $this->assertEmpty($res);
@@ -378,35 +334,35 @@ class BaseTest extends PHPUnit_Framework_testCase
     public function test_getPageNumber()
     {
         $_SERVER['HTTP_USER_AGENT'] = "google";
-        $obj = new Base($this->params_old);
+        $obj = new Base($this->params);
         $getPageNumber = self::getMethod($obj, '_getPageNumber');
         $res = $getPageNumber->invokeArgs($obj, array());
         $this->assertEquals(1, $res);
 
         $_GET['bvpage'] = 2;
         $_GET['bvrrp'] = 'Main_Site-en_US/reviews/product/2/00636.htm';
-        $this->params_old['base_page_url'] = 'http://localhost/Example.php/index.php?bvrrp=Main_Site-en_US/reviews/product/2/00636.htm ';
-        $obj = new Base($this->params_old);
+        $this->params['base_url'] = 'http://localhost/Example.php/index.php?bvrrp=Main_Site-en_US/reviews/product/2/00636.htm ';
+        $obj = new Base($this->params);
         $getPageNumber = self::getMethod($obj, '_getPageNumber');
         $res = $getPageNumber->invokeArgs($obj, array());
         $this->assertEquals(2, $res);
-        $this->assertNotContains($_GET['bvrrp'], $obj->config['base_page_url']);
+        $this->assertNotContains($_GET['bvrrp'], $obj->config['base_url']);
 
         unset($_GET['bvpage']);
         $_GET['bvrrp'] = 'Main_Site-en_US/reviews/product/3/00636.htm';
-        $this->params_old['base_page_url'] = 'http://localhost/Example.php/index.php?bvrrp=Main_Site-en_US/reviews/product/2/00636.htm ';
-        $obj = new Base($this->params_old);
+        $this->params['base_url'] = 'http://localhost/Example.php/index.php?bvrrp=Main_Site-en_US/reviews/product/2/00636.htm ';
+        $obj = new Base($this->params);
         $getPageNumber = self::getMethod($obj, '_getPageNumber');
         $res = $getPageNumber->invokeArgs($obj, array());
         $this->assertEquals(3, $res);
-        $this->assertNotContains($_GET['bvrrp'], $obj->config['base_page_url']);
+        $this->assertNotContains($_GET['bvrrp'], $obj->config['base_url']);
 
 
         //bvstate test, ucoment after implementing
         //unset($_GET['bvpage']);
         //unset($_GET['bvrrp']);
-        //$this->params_old['page_url'] = 'http://localhost/Example.php/index.php?bvpage=pg4/ctr/std/id87645&bvstate=pg:3/ct:r';
-        //$obj = new Base($this->params_old);
+        //$this->params['page_url'] = 'http://localhost/Example.php/index.php?bvpage=pg4/ctr/std/id87645&bvstate=pg:3/ct:r';
+        //$obj = new Base($this->params);
         //$getPageNumber = self::getMethod($obj, '_getPageNumber');
         //$res = $getPageNumber->invokeArgs($obj, array());
         //$this->assertEquals(3, $res);
@@ -415,16 +371,15 @@ class BaseTest extends PHPUnit_Framework_testCase
     public function test_isBot()
     {
         $_GET['bvreveal'] = "something";
-        $obj = new Base($this->params_old);
+        $obj = new Base($this->params);
         $isBot = self::getMethod($obj, '_isBot');
         $res = $isBot->invokeArgs($obj, array());
         $this->assertTrue($res);
 
         $_SERVER['HTTP_USER_AGENT'] = "NON_EXISTING";
         unset($_GET['bvreveal']);
-        //should be removed
-        $this->params_old['bot_detection'] = TRUE;
-        $obj = new Base($this->params_old);
+
+        $obj = new Base($this->params);
         $isBot = self::getMethod($obj, '_isBot');
         $res = $isBot->invokeArgs($obj, array());
         $res = !empty($res);
@@ -432,9 +387,8 @@ class BaseTest extends PHPUnit_Framework_testCase
 
         $_SERVER['HTTP_USER_AGENT'] = "google";
         unset($_GET['bvreveal']);
-        //should be removed
-        $this->params_old['bot_detection'] = TRUE;
-        $obj = new Base($this->params_old);
+
+        $obj = new Base($this->params);
         $isBot = self::getMethod($obj, '_isBot');
         $res = $isBot->invokeArgs($obj, array());
         $res = !empty($res);
@@ -444,22 +398,22 @@ class BaseTest extends PHPUnit_Framework_testCase
     public function test_isSdkEnabled()
     {
         $_SERVER['HTTP_USER_AGENT'] = "google";
-        $this->params_old['seo_sdk_enabled'] = TRUE;
-        $obj = new Base($this->params_old);
+        $this->params['seo_sdk_enabled'] = TRUE;
+        $obj = new Base($this->params);
         $isSdkEnabled = self::getMethod($obj, '_isSdkEnabled');
         $res = $isSdkEnabled->invokeArgs($obj, array());
         $this->assertTrue($res);
 
-        $this->params_old['seo_sdk_enabled'] = FALSE;
+        $this->params['seo_sdk_enabled'] = FALSE;
         $_GET['bvreveal'] = "debug";
-        $obj = new Base($this->params_old);
+        $obj = new Base($this->params);
         $isSdkEnabled = self::getMethod($obj, '_isSdkEnabled');
         $res = $isSdkEnabled->invokeArgs($obj, array());
         $this->assertTrue($res);
 
-        $this->params_old['seo_sdk_enabled'] = FALSE;
+        $this->params['seo_sdk_enabled'] = FALSE;
         $_GET['bvreveal'] = "not_debug";
-        $obj = new Base($this->params_old);
+        $obj = new Base($this->params);
         $isSdkEnabled = self::getMethod($obj, '_isSdkEnabled');
         $res = $isSdkEnabled->invokeArgs($obj, array());
         $this->assertFalse($res);
@@ -467,15 +421,10 @@ class BaseTest extends PHPUnit_Framework_testCase
 
     public function test_renderAggregateRating()
     {
-        $this->params_old['bot_detection'] = TRUE;
         $_SERVER['HTTP_USER_AGENT'] = "google";
 
-        // remove this 2 lines when SEO-427 will be done
-        $_GET['bvreveal'] = "not_debug";
-        $this->params_old['content_type'] = "product";
-
         $obj = $this->getMockBuilder('Base')
-                ->setConstructorArgs(array($this->params_old))
+                ->setConstructorArgs(array($this->params))
                 ->setMethods(['curlError', 'curlErrorNo', 'curlExecute', 'curlInfo'])
                 ->getMock();
         $obj->expects($this->any())
@@ -509,15 +458,10 @@ class BaseTest extends PHPUnit_Framework_testCase
 
     public function test_renderReviews()
     {
-        $this->params_old['bot_detection'] = TRUE;
         $_SERVER['HTTP_USER_AGENT'] = "google";
 
-        // remove this 2 lines when SEO-427 will be done
-        $_GET['bvreveal'] = "not_debug";
-        $this->params_old['content_type'] = "product";
-
         $obj = $this->getMockBuilder('Base')
-                ->setConstructorArgs(array($this->params_old))
+                ->setConstructorArgs(array($this->params))
                 ->setMethods(['curlError', 'curlErrorNo', 'curlExecute', 'curlInfo'])
                 ->getMock();
         $obj->expects($this->any())
@@ -551,15 +495,11 @@ class BaseTest extends PHPUnit_Framework_testCase
 
     public function test_renderSEO()
     {
-        // All bot_detection should be removed after implementing SEO-430
-        $this->params_old['bot_detection'] = TRUE;
-        // remove this line when SEO-427 will be done
-        $this->params_old['content_type'] = "product";
         //is bot
         $_SERVER['HTTP_USER_AGENT'] = "google";
 
         $obj = $this->getMockBuilder('Base')
-                ->setConstructorArgs(array($this->params_old))
+                ->setConstructorArgs(array($this->params))
                 ->setMethods(['curlError', 'curlErrorNo', 'curlExecute', 'curlInfo'])
                 ->getMock();
         $obj->expects($this->any())
@@ -576,7 +516,6 @@ class BaseTest extends PHPUnit_Framework_testCase
         $obj->expects($this->any())
                 ->method('curlInfo')
                 ->will($this->returnValue(array('http_code' => 200, 'total_time' => 100)));
-
 
         $renderSEO = self::getMethod($obj, '_renderSEO');
 
@@ -587,9 +526,9 @@ class BaseTest extends PHPUnit_Framework_testCase
 
         //is not bot
         $_SERVER['HTTP_USER_AGENT'] = "NOT_BOT";
-        $this->params_old['execution_timeout'] = 0;
+        $this->params['execution_timeout'] = 0;
         $obj = $this->getMockBuilder('Base')
-                ->setConstructorArgs(array($this->params_old))
+                ->setConstructorArgs(array($this->params))
                 ->setMethods(['curlError', 'curlErrorNo', 'curlExecute', 'curlInfo'])
                 ->getMock();
         $obj->expects($this->any())
@@ -606,7 +545,6 @@ class BaseTest extends PHPUnit_Framework_testCase
         $obj->expects($this->any())
                 ->method('curlInfo')
                 ->will($this->returnValue(array('http_code' => 200, 'total_time' => 100)));
-
 
         $renderSEO = self::getMethod($obj, '_renderSEO');
 
@@ -619,7 +557,7 @@ class BaseTest extends PHPUnit_Framework_testCase
     public function test_replaceSection()
     {
         $_SERVER['HTTP_USER_AGENT'] = "google";
-        $obj = new Base($this->params_old);
+        $obj = new Base($this->params);
         $replaceSection = self::getMethod($obj, '_replaceSection');
         $str = '<div id="BVRRContainer"><!--begin-reviews--> Mock reviews <!--end-reviews--></div>';
         $search_str_begin = '<!--begin-reviews-->';
@@ -635,9 +573,9 @@ class BaseTest extends PHPUnit_Framework_testCase
         $_SERVER['HTTP_USER_AGENT'] = "google";
         $str = 'Base url: {INSERT_PAGE_URI}';
         $base_url = 'www.base.url';
-        $this->params_old['base_page_url'] = $base_url;
-        //$this->params_new['base_url'] = $base_url;
-        $obj = new Base($this->params_old);
+        $this->params['base_url'] = $base_url;
+
+        $obj = new Base($this->params);
         $replaceTokens = self::getMethod($obj, '_replaceTokens');
 
         $res = $replaceTokens->invokeArgs($obj, array($str));
@@ -645,9 +583,9 @@ class BaseTest extends PHPUnit_Framework_testCase
         $this->assertEquals('Base url: www.base.url?', $res);
 
         $base_url = 'www.base.url?debug=true';
-        $this->params_old['base_page_url'] = $base_url;
-        //$this->params_new['base_url'] = $base_url;
-        $obj = new Base($this->params_old);
+        $this->params['base_url'] = $base_url;
+
+        $obj = new Base($this->params);
         $replaceTokens = self::getMethod($obj, '_replaceTokens');
 
         $res = $replaceTokens->invokeArgs($obj, array($str));
@@ -660,7 +598,7 @@ class BaseTest extends PHPUnit_Framework_testCase
         $_SERVER['HTTP_USER_AGENT'] = "google";
         $msg1 = 'The message1;';
         $msg2 = 'The message2';
-        $obj = new Base($this->params_old);
+        $obj = new Base($this->params);
         $setBuildMessage = self::getMethod($obj, '_setBuildMessage');
 
         $setBuildMessage->invokeArgs($obj, array($msg1));
