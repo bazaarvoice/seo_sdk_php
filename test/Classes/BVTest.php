@@ -25,7 +25,7 @@ class BVTest extends PHPUnit_Framework_testCase
     public function test_getCurrentUrl()
     {
         $_SERVER = array(
-            'HTTPS' => 1,
+            'HTTPS' => 'on',
             'SERVER_NAME' => 'localhost',
             'SERVER_PORT' => '80',
             'REQUEST_URI' => '/index.php?bvreveal=debug',

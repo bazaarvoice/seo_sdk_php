@@ -131,9 +131,11 @@ class BV
     // included in the BV class.
     public function _getCurrentUrl()
     {
-        // depending on protocol set the
-        // beginning of url and default port
-        if (isset($_SERVER["HTTPS"])) {
+        // depending on protocol set the beginning of url and default port.
+        // Note that various servers can and do set various different values in
+        // $_SERVER['HTTPS']. See:
+        // http://stackoverflow.com/questions/1175096/how-to-find-out-if-you-are-using-https-without-serverhttps
+        if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
             $url = 'https://';
             $defaultPort = '443';
         } else {
@@ -141,15 +143,15 @@ class BV
             $defaultPort = '80';
         }
 
-        $url .= $_SERVER["SERVER_NAME"];
+        $url .= $_SERVER['SERVER_NAME'];
 
         // if there is a port other than the defaultPort
         // being used it needs to be included
-        if ($_SERVER["SERVER_PORT"] != $defaultPort) {
-            $url .= ":" . $_SERVER["SERVER_PORT"];
+        if ($_SERVER['SERVER_PORT'] != $defaultPort) {
+            $url .= ':' . $_SERVER['SERVER_PORT'];
         }
 
-        $url .= $_SERVER["REQUEST_URI"];
+        $url .= $_SERVER['REQUEST_URI'];
 
         return $url;
     }
@@ -566,7 +568,7 @@ class Base
         }
         return $file;
     }
-    
+
     public function curlExecute($ch)
     {
         return curl_exec($ch);
