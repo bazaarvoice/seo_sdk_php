@@ -5,7 +5,7 @@
  */
 class BVFooter
 {
-    const VERSION = '2.2.0.2';
+    const VERSION = '2.3.0.1';
 
     private $base;
     private $url;
@@ -84,6 +84,13 @@ class BVFooter
         $local_seo_file_root = (!empty($this->base->config['load_seo_files_locally'])) ? $this->base->config['local_seo_file_root'] : 'FALSE';
         $content_type = mb_strtoupper($this->base->config['content_type']);
         $subject_type = mb_strtoupper($this->base->config['subject_type']);
+        if (!empty($this->base->config['page_params']['subject_id'])
+                && !empty($this->base->config['page_params']['content_type'])
+                && $this->base->config['page_params']['content_type'] == $this->base->config['content_type']) {
+            $subject_id = $this->base->config['page_params']['subject_id'];
+        } else {
+            $subject_id = $this->base->config['subject_id'];
+        }
 
         $footer = "\n" . '<ul id="BVSEOSDK_DEBUG" style="display:none;">';
 
@@ -104,7 +111,7 @@ class BVFooter
         $footer .= "\n" . '   <li data-bvseo="seo.sdk.charset">' . $this->base->config['charset'] . '</li>';
         $footer .= "\n" . '   <li data-bvseo="seo.sdk.ssl.enabled">' . $ssl_enabled . '</li>';
         $footer .= "\n" . '   <li data-bvseo="crawlerAgentPattern">' . $this->base->config['crawler_agent_pattern'] . '</li>';
-        $footer .= "\n" . '   <li data-bvseo="subjectID">' . urlencode($this->base->config['subject_id']) . '</li>';
+        $footer .= "\n" . '   <li data-bvseo="subjectID">' . urlencode($subject_id) . '</li>';
 
 
         $footer .= "\n" . '   <li data-bvseo="en">' . $sdk_enabled . '</li>';

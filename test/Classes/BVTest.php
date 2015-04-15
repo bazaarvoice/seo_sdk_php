@@ -63,4 +63,23 @@ class BVTest extends PHPUnit_Framework_testCase
         $this->assertEquals('http://localhost:88/index.php?bvreveal=debug', $res);
     }
 
+    public function test_parsePageUrl() {
+        $_SERVER = array(
+            'HTTPS' => 'on',
+            'SERVER_NAME' => 'localhost',
+            'SERVER_PORT' => '80',
+            'REQUEST_URI' => '/index.php?bvreveal=debug',
+            'HTTP_USER_AGENT' => 'google',
+        );
+        $this->params['page_url'] = 'localhost/index.php?bvstate=ct:q/st:c/pg:2';
+        $obj = new BV($this->params);
+        $parsePageUrl = self::getMethod($obj, '_parsePageUrl');
+        $res = $parsePageUrl->invokeArgs($obj, array(&$this->params));
+        
+        $this->assertEquals($this->params['bv_page_data']['bvstate'], "ct:q/st:c/pg:2");
+        $this->assertEquals($res['page'], "2");
+        $this->assertEquals($res['content_type'], "questions");
+        $this->assertEquals($res['subject_type'], "category");
+    }
+
 }

@@ -18,12 +18,12 @@ class SpotlightsImplementingTest extends PHPUnit_Framework_testCase
     public function testSpotlights()
     {
         $_SERVER['HTTP_USER_AGENT'] = 'google';
-        $_GET['bvreveal'] = 'debug';
 
         $bv = new BV(array(
             'bv_root_folder' => $this->deployment_zone_id,
             'subject_id' => $this->product_id,
             'cloud_key' => $this->cloud_key,
+            'bvreveal' => 'debug'
         ));
 
         $content = $bv->spotlights->getContent();

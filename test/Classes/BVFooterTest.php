@@ -4,7 +4,7 @@ require_once 'bvseosdk.php';
 require_once 'test/config.php';
 
 /**
- * Test class to test Stories.
+ * Test BVFooter class.
  */
 class BVFooterTest extends PHPUnit_Framework_testCase
 {

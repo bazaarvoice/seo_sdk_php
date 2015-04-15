@@ -79,6 +79,16 @@ class BV
      */
     public function __construct($params = array())
     {
+        $pageURLParams = array();
+        // get bvstate parameters from page URL
+        if (!empty($params) && isset($params['page_url'])) {
+            $pageURLParams = $this->_parsePageUrl($params);
+        }
+
+        // get bvstate parameters from URL
+        $pageParams = $this->_parseUrl();
+        $pageParams = array_merge($pageURLParams, $pageParams);
+
         // check to make sure we have the required parameters
         if (empty($params) OR !$params['bv_root_folder'] OR !$params['subject_id']) {
             throw new Exception('BV Class missing required parameters.
@@ -107,10 +117,29 @@ class BV
             'seo_sdk_enabled' => TRUE,
             'execution_timeout' => 500,
             'execution_timeout_bot' => 2000,
+            'bvreveal' => isset($params['bvreveal']) ? $params['bvreveal'] : filter_input(INPUT_GET, 'bvreveal'),
+            'page' => 1
         );
 
         // merge passed in params with defaults for config.
         $this->config = array_merge($this->config, $params);
+        $this->config['page_params'] = $pageParams;
+
+        $ct = isset($this->config['page_params']['content_type']) ? $this->config['page_params']['content_type'] : $this->config['content_type'];
+        if (isset($ct)) {
+            switch ($ct) {
+                case 'reviews': $this->SEO = new Reviews($this->config);
+                    break;
+                case 'questions': $this->SEO = new Questions($this->config);
+                    break;
+                case 'stories': $this->SEO = new Stories($this->config);
+                    break;
+                case 'spotlights': $this->SEO = new Spotlights($this->config);
+                    break;
+                default:
+                    throw new Exception('Invalid content_type value provided: ' . $this->config['content_type']);
+            }
+        }
 
         // setup the reviews object
         $this->reviews = new Reviews($this->config);
@@ -123,12 +152,50 @@ class BV
 
         // setup the spotlights object
         $this->spotlights = new Spotlights($this->config);
-
-        // setup the timer object
     }
 
-    // since this is used to set the default for an optional config option it is
-    // included in the BV class.
+    /**
+     * Function for parsing the page URL and filling in parameters.
+     */
+    private function _parsePageUrl(&$params)
+    {
+        $bvStateParams = array();
+        // get the query from URL
+        if (mb_ereg('\?(.*)', $params['page_url'], $matches)) {
+            if (mb_parse_str($matches[1], $bvPageData)) {
+                $params['bv_page_data'] = $bvPageData;
+                if (isset($bvPageData['bvstate'])) {
+                    $bvStateHash = BVUtility::getBVStateHash($bvPageData['bvstate']);
+                    $bvStateParams = BVUtility::getBVStateParams($bvStateHash);
+                }
+            }
+        }
+        return $bvStateParams;
+    }
+
+    /**
+     * Function for parsing the URL and filling in parameters.
+     */
+    private function _parseUrl()
+    {
+        $bvStateHash = BVUtility::getBVStateHash();
+        $bvStateParams = BVUtility::getBVStateParams($bvStateHash);
+
+        if (!empty($bvStateParams)) {
+            $bvStateParams['base_url_bvstate'] = TRUE;
+            if (empty($bvStateParams['page'])) {
+                $bvStateParams['page'] = 1;
+            }
+        }
+        return $bvStateParams;
+    }
+
+    /**
+     * Function construct and return currents URL.
+     *
+     * Since this is used to set the default for an optional config option it is
+     * included in the BV class.
+     */
     public function _getCurrentUrl()
     {
         // depending on protocol set the beginning of url and default port.
@@ -193,6 +260,23 @@ class Base
     }
 
     /**
+     * Function check bvstate content type proprty.
+     * bvstate paremeter should be user only
+     * if content type in bvstate the same
+     * as predefined content type or id bvstate content typ not set.
+     */
+    protected function _checkBVStateContentType()
+    {
+        if (empty($this->config['page_params']['content_type'])) {
+            return TRUE;
+        }
+        if (!empty($this->config['page_params']['content_type']) && $this->config['page_params']['content_type'] == $this->config['content_type']) {
+            return TRUE;
+        }
+        return FALSE;
+    }
+
+    /**
      * Function for collecting messages
      */
     protected function _setBuildMessage($msg)
@@ -208,7 +292,7 @@ class Base
     {
         if ($this->config['seo_sdk_enabled']) {
             return true;
-        } else if (isset($_GET['bvreveal']) && $_GET['bvreveal'] == 'debug') {
+        } else if (!empty($this->config['bvreveal']) && $this->config['bvreveal'] == 'debug') {
             return true;
         } else {
             return false;
@@ -395,7 +479,7 @@ class Base
      */
     private function _isBot()
     {
-        if (isset($_GET['bvreveal'])) {
+        if (!empty($this->config['bvreveal'])) {
             return TRUE;
         }
 
@@ -413,52 +497,73 @@ class Base
      */
     private function _getPageNumber()
     {
-        // default to page 1 if a page is not specified in the URL
         $page_number = 1;
-
-        if (!empty($this->config['page_url'])) {
-            //parse the page url that's passed in via the parameters
-            $currentUrlArray = parse_url($this->config['page_url']);
-
-            $query = $currentUrlArray['path']; //get the path out of the parsed url array
-
-            mb_parse_str($query, $bvcurrentpagedata);  //parse the sub url such that you get the important part...page number
+        if (!empty($this->config['page_params']['page']) && $this->_checkBVStateContentType()) {
+            $page_number = $this->config['page_params']['page'];
+        } else if (!empty($this->config['page'])) {
+            $page_number = $this->config['page'];
         }
 
+
+        // fix possible not correct URL endings
+        $this->config['base_url'] = mb_ereg_replace('[&|?]$', '', $this->config['base_url']);
+
+        if (!empty($this->config['bv_page_data'])) {
+            $bvcurrentpagedata = $this->config['bv_page_data'];
+        }
+
+        // first, check bvstate parameter
+        if (isset($this->config['page_params']['base_url_bvstate']) && $this->_checkBVStateContentType()) {
+            $this->config['base_url'] = BVUtility::removeUrlParam($this->config['base_url'], 'bvstate');
+            $this->config['base_url'] = BVUtility::removeUrlParam($this->config['base_url'], 'bvrrp');
+            $this->config['base_url'] = BVUtility::removeUrlParam($this->config['base_url'], 'bvqap');
+            $this->config['base_url'] = BVUtility::removeUrlParam($this->config['base_url'], 'bvsyp');
+        }
         // bvpage is not currently implemented
-        if (isset($_GET['bvpage'])) {
-            $page_number = (int) $_GET['bvpage'];
-
-            // remove the bvpage parameter from the base URL so we don't keep appending it
-            $seo_param = mb_ereg_replace('/', '\/', $_GET['bvrrp']); // need to escape slashes for regex
-            $this->config['base_url'] = mb_ereg_replace('[?&]bvrrp=' . $seo_param, '', $this->config['base_url']);
-        }
+        //else if (isset($_GET['bvpage'])) {
+        //    $page_number = (int) $_GET['bvpage'];
+        //    // remove the bvpage parameter from the base URL so we don't keep appending it
+        //    $seo_param = mb_ereg_replace('/', '\/', $_GET['bvrrp']); // need to escape slashes for regex
+        //    $this->config['base_url'] = mb_ereg_replace('[?&]bvrrp=' . $seo_param, '', $this->config['base_url']);
+        //}
         // other implementations use the bvrrp, bvqap, or bvsyp parameter ?bvrrp=1234-en_us/reviews/product/2/ASF234.htm
         else if (isset($_GET['bvrrp']) OR isset($_GET['bvqap']) OR isset($_GET['bvsyp'])) {
             if (isset($_GET['bvrrp'])) {
                 $bvparam = $_GET['bvrrp'];
+                $bvParamName = 'bvrrp';
             } else if (isset($_GET['bvqap'])) {
                 $bvparam = $_GET['bvqap'];
+                $bvParamName = 'bvqap';
             } else {
                 $bvparam = $_GET['bvsyp'];
+                $bvParamName = 'bvsyp';
             }
         } else if (isset($bvcurrentpagedata)) {  //if the base url doesn't include the page number information and the current url
             //is defined then use the data from the current URL.
-            if (isset($bvcurrentpagedata['bvpage'])) {
-                $page_number = (int) $bvcurrentpagedata['bvpage'];
-                $bvparam = $bvcurrentpagedata['bvpage'];
-                // remove the bvpage parameter from the base URL so we don't keep appending it
-                $seo_param = mb_ereg_replace('/', '\/', $_GET['bvrrp']); // need to escape slashses for regex
-                $this->config['base_url'] = mb_ereg_replace('[?&]bvrrp=' . $seo_param, '', $this->config['base_url']);
-            }
+            //if (isset($bvcurrentpagedata['bvpage'])) {
+            //    $page_number = (int) $bvcurrentpagedata['bvpage'];
+            //    $bvparam = $bvcurrentpagedata['bvpage'];
+            //    // remove the bvpage parameter from the base URL so we don't keep appending it
+            //    $seo_param = mb_ereg_replace('/', '\/', $_GET['bvrrp']); // need to escape slashses for regex
+            //    $this->config['base_url'] = mb_ereg_replace('[?&]bvrrp=' . $seo_param, '', $this->config['base_url']);
+            //}
             // other implementations use the bvrrp, bvqap, or bvsyp parameter ?bvrrp=1234-en_us/reviews/product/2/ASF234.htm
-            else if (isset($bvcurrentpagedata['bvrrp']) || isset($bvcurrentpagedata['bvqap']) || isset($bvcurrentpagedata['bvsyp'])) {
+            if (isset($bvcurrentpagedata['bvstate'])) {
+                $bvStateHash = BVUtility::getBVStateHash($bvcurrentpagedata['bvstate']);
+                $bvStateParams = BVUtility::getBVStateParams($bvStateHash);
+                if (!empty($bvStateParams['page'])) {
+                    $page_number = $bvStateParams['page'];
+                }
+            } else if (isset($bvcurrentpagedata['bvrrp']) || isset($bvcurrentpagedata['bvqap']) || isset($bvcurrentpagedata['bvsyp'])) {
                 if (isset($bvcurrentpagedata['bvrrp'])) {
                     $bvparam = $bvcurrentpagedata['bvrrp'];
+                    $bvParamName = 'bvrrp';
                 } else if (isset($bvcurrentpagedata['bvqap'])) {
                     $bvparam = $bvcurrentpagedata['bvqap'];
+                    $bvParamName = 'bvqap';
                 } else {
                     $bvparam = $bvcurrentpagedata['bvsyp'];
+                    $bvParamName = 'bvsyp';
                 }
             }
         }
@@ -466,16 +571,12 @@ class Base
         if (!empty($bvparam)) {
             mb_ereg('\/(\d+?)\/[^\/]+$', $bvparam, $page_number);
             $page_number = max(1, (int) $page_number[1]);
-
-            // remove the bvrrp parameter from the base URL so we don't keep appending it
-            $seo_param = mb_ereg_replace('/', '\/', $bvparam); // need to escape slashes for regex
-            $this->config['base_url'] = mb_ereg_replace('[?&]bvrrp=' . $seo_param, '', $this->config['base_url']);
+            $this->config['base_url'] = BVUtility::removeUrlParam($this->config['base_url'], $bvParamName);
         }
         $this->config['page'] = $page_number;
 
         return $page_number;
     }
-
 // end of _getPageNumber()
 
     /**
@@ -519,7 +620,11 @@ class Base
             $url_parts[] = $this->config['content_sub_type'];
         }
 
-        $url_parts[] = urlencode($this->config['subject_id']) . '.htm';
+        if (!empty($this->config['page_params']['subject_id']) && $this->_checkBVStateContentType()) {
+            $url_parts[] = urlencode($this->config['page_params']['subject_id']) . '.htm';
+        } else {
+            $url_parts[] = urlencode($this->config['subject_id']) . '.htm';
+        }
 
         // if our SEO content source is a file path
         // we need to remove the first two sections
@@ -690,7 +795,7 @@ class Base
     {
         $bvf = new BVFooter($this, $access_method, $this->msg);
         $footer = $bvf->buildSDKFooter();
-        if (isset($_GET['bvreveal']) && $_GET['bvreveal'] == 'debug') {
+        if (!empty($this->config['bvreveal']) && $this->config['bvreveal'] == 'debug') {
             $footer .= $bvf->buildSDKDebugFooter();
         }
         return $footer;
@@ -699,6 +804,30 @@ class Base
     public function getBVMessages()
     {
         return $this->msg;
+    }
+
+    public function getContent()
+    {
+        $this->_setBuildMessage('Content Type "' . $this->config['content_type'] . '" is not supported by getContent().');
+        $pay_load = $this->_buildComment('', 'getContent');
+
+        return $pay_load;
+    }
+
+    public function getAggregateRating()
+    {
+        $this->_setBuildMessage('Content Type "' . $this->config['content_type'] . '" is not supported by getAggregateRating().');
+        $pay_load = $this->_buildComment('', 'getAggregateRating');
+
+        return $pay_load;
+    }
+
+    public function getReviews()
+    {
+        $this->_setBuildMessage('Content Type "' . $this->config['content_type'] . '" is not supported by getReviews().');
+        $pay_load = $this->_buildComment('', 'getReviews');
+
+        return $pay_load;
     }
 
 }
@@ -742,13 +871,18 @@ class Reviews extends Base
     {
         $payload = $this->_renderSEO('getContent');
 
+        if (!empty($this->config['page_params']['subject_id']) && $this->_checkBVStateContentType()) {
+            $subject_id = $this->config['page_params']['subject_id'];
+        } else {
+            $subject_id = $this->config['subject_id'];
+        }
         // if they want to power display integration as well
         // then we need to include the JS integration code
         if ($this->config['include_display_integration_code']) {
             $payload .= '
                <script>
                    $BV.ui("rr", "show_reviews", {
-                       productId: "' . $this->config['subject_id'] . '"
+                       productId: "' . $subject_id . '"
                    });
                </script>
            ';
@@ -783,7 +917,11 @@ class Questions extends Base
     public function getContent()
     {
         $payload = $this->_renderSEO('getContent');
-
+        if (!empty($this->config['page_params']['subject_id']) && $this->_checkBVStateContentType()) {
+            $subject_id = $this->config['page_params']['subject_id'];
+        } else {
+            $subject_id = $this->config['subject_id'];
+        }
         // if they want to power display integration as well
         // then we need to include the JS integration code
         if ($this->config['include_display_integration_code']) {
@@ -791,7 +929,7 @@ class Questions extends Base
             $payload .= '
                <script>
                    $BV.ui("qa", "show_questions", {
-                       productId: "' . $this->config['subject_id'] . '"
+                       productId: "' . $subject_id . '"
                    });
                </script>
            ';
@@ -840,14 +978,18 @@ class Stories extends Base
     public function getContent()
     {
         $payload = $this->_renderSeo('getContent');
-
+        if (!empty($this->config['page_params']['subject_id']) && $this->_checkBVStateContentType()) {
+            $subject_id = $this->config['page_params']['subject_id'];
+        } else {
+            $subject_id = $this->config['subject_id'];
+        }
         // if they want to power display integration as well
         // then we need to include the JS integration code
         if ($this->config['include_display_integration_code']) {
             $payload .= '
                <script>
                    $BV.ui("su", "show_stories", {
-                       productId: "' . $this->config['subject_id'] . '"
+                       productId: "' . $subject_id . '"
                    });
                </script>
            ';

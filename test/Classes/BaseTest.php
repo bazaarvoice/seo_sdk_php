@@ -42,7 +42,7 @@ class BaseTest extends PHPUnit_Framework_testCase
     public function test_buildComment()
     {
         $_SERVER['HTTP_USER_AGENT'] = "google";
-        $_GET['bvreveal'] = 'debug';
+        $this->params['bvreveal'] = 'debug';
         $this->params['page'] = 5;
         $obj = new Base($this->params);
         $buildComment = self::getMethod($obj, '_buildComment');
@@ -357,27 +357,27 @@ class BaseTest extends PHPUnit_Framework_testCase
         $this->assertEquals(3, $res);
         $this->assertNotContains($_GET['bvrrp'], $obj->config['base_url']);
 
-
-        //bvstate test, ucoment after implementing
-        //unset($_GET['bvpage']);
-        //unset($_GET['bvrrp']);
-        //$this->params['page_url'] = 'http://localhost/Example.php/index.php?bvpage=pg4/ctr/std/id87645&bvstate=pg:3/ct:r';
-        //$obj = new Base($this->params);
-        //$getPageNumber = self::getMethod($obj, '_getPageNumber');
-        //$res = $getPageNumber->invokeArgs($obj, array());
-        //$this->assertEquals(3, $res);
+        unset($_GET['bvpage']);
+        unset($_GET['bvrrp']);
+        // Let's think we have page_url = 'http://localhost/Example.php/index.php?bvstate=pg:3'
+        // So, in _getPageNumber we should have bv_page_data
+        $this->params['bv_page_data'] = array('bvstate' => 'pg:3');
+        $obj = new Base($this->params);
+        $getPageNumber = self::getMethod($obj, '_getPageNumber');
+        $res = $getPageNumber->invokeArgs($obj, array());
+        $this->assertEquals(3, $res);
     }
 
     public function test_isBot()
     {
-        $_GET['bvreveal'] = "something";
+        $this->params['bvreveal'] = 'something';
         $obj = new Base($this->params);
         $isBot = self::getMethod($obj, '_isBot');
         $res = $isBot->invokeArgs($obj, array());
         $this->assertTrue($res);
 
         $_SERVER['HTTP_USER_AGENT'] = "NON_EXISTING";
-        unset($_GET['bvreveal']);
+        unset($this->params['bvreveal']);
 
         $obj = new Base($this->params);
         $isBot = self::getMethod($obj, '_isBot');
@@ -386,7 +386,7 @@ class BaseTest extends PHPUnit_Framework_testCase
         $this->assertFalse($res);
 
         $_SERVER['HTTP_USER_AGENT'] = "google";
-        unset($_GET['bvreveal']);
+        unset($this->params['bvreveal']);
 
         $obj = new Base($this->params);
         $isBot = self::getMethod($obj, '_isBot');
@@ -405,14 +405,14 @@ class BaseTest extends PHPUnit_Framework_testCase
         $this->assertTrue($res);
 
         $this->params['seo_sdk_enabled'] = FALSE;
-        $_GET['bvreveal'] = "debug";
+        $this->params['bvreveal'] = 'debug';
         $obj = new Base($this->params);
         $isSdkEnabled = self::getMethod($obj, '_isSdkEnabled');
         $res = $isSdkEnabled->invokeArgs($obj, array());
         $this->assertTrue($res);
 
         $this->params['seo_sdk_enabled'] = FALSE;
-        $_GET['bvreveal'] = "not_debug";
+        $this->params['bvreveal'] = 'not_debug';
         $obj = new Base($this->params);
         $isSdkEnabled = self::getMethod($obj, '_isSdkEnabled');
         $res = $isSdkEnabled->invokeArgs($obj, array());
