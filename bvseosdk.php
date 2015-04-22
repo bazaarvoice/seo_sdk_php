@@ -619,6 +619,8 @@ class Base
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         // Timeout in seconds
         curl_setopt($ch, CURLOPT_TIMEOUT, ($this->config['latency_timeout'] / 1000));
+        // Enable decoding of the response
+        curl_setopt($ch, CURLOPT_ENCODING, 'gzip,deflate');
 
         if ($this->config['proxy_host'] != '') {
             curl_setopt($ch, CURLOPT_PROXY, $this->config['proxy_host']);
