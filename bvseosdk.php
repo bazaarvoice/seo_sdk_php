@@ -775,7 +775,7 @@ class Base
     private function _replaceTokens($content)
     {
         // determine if query string exists in current page url
-        if (parse_url($this->config['base_url'], PHP_URL_QUERY) != '') {
+        if (mb_ereg('\?(.*)', $this->config['base_url'])) {
             // append an ampersand, because the URL already has a ? mark
             $page_url_query_prefix = '&';
         } else {
