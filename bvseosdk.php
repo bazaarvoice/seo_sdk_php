@@ -277,7 +277,7 @@ class Base
     }
 
     /**
-     * Function for collecting messages
+     * Function for collecting messages.
      */
     protected function _setBuildMessage($msg)
     {
@@ -286,17 +286,14 @@ class Base
     }
 
     /**
-     * Return true if either seo_sdk_enabled or bvreveal flags are set, and false otherwise
+     * Is this SDK enabled?
+     *
+     * Return true if either seo_sdk_enabled is set truthy or bvreveal flags are
+     * set.
      */
     private function _isSdkEnabled()
     {
-        if ($this->config['seo_sdk_enabled']) {
-            return true;
-        } else if (!empty($this->config['bvreveal']) && $this->config['bvreveal'] == 'debug') {
-            return true;
-        } else {
-            return false;
-        }
+        return $this->config['seo_sdk_enabled'] || $this->_getBVReveal();
     }
 
     /**
@@ -485,6 +482,23 @@ class Base
 
         // search the user agent string for an indication if this is a search bot or not
         return mb_eregi('(' . $this->config['crawler_agent_pattern'] . ')', $_SERVER['HTTP_USER_AGENT']);
+    }
+
+    /**
+     * getBVReveal
+     *
+     * Return true if bvreveal flags are set, either via reveal:debug in the
+     * bvstate query parameter or in the old bvreveal query parameter.
+     */
+    private function _getBVReveal()
+    {
+        if (!empty($this->config['bvreveal']) && $this->config['bvreveal'] == 'debug') {
+            return true;
+        } else if (!empty($this->config['page_params']['bvreveal']) && $this->config['page_params']['bvreveal'] == 'debug') {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -795,7 +809,8 @@ class Base
     {
         $bvf = new BVFooter($this, $access_method, $this->msg);
         $footer = $bvf->buildSDKFooter();
-        if (!empty($this->config['bvreveal']) && $this->config['bvreveal'] == 'debug') {
+        $reveal = $this->_getBVReveal();
+        if ($reveal) {
             $footer .= $bvf->buildSDKDebugFooter();
         }
         return $footer;

@@ -75,7 +75,7 @@ class BVTest extends PHPUnit_Framework_testCase
         $obj = new BV($this->params);
         $parsePageUrl = self::getMethod($obj, '_parsePageUrl');
         $res = $parsePageUrl->invokeArgs($obj, array(&$this->params));
-        
+
         $this->assertEquals($this->params['bv_page_data']['bvstate'], "ct:q/st:c/pg:2");
         $this->assertEquals($res['page'], "2");
         $this->assertEquals($res['content_type'], "questions");

@@ -40,9 +40,8 @@ on the product page inside the `<div id="BVRRContainer"></div>`. For example:
 
 4. To test this you will need to modify your HTTP user agent string to match
 that of a search engine. Or for testing convenience, you can add the query
-parameter `?bvreveal=bot` to trigger the SDK to return SEO content.
-`?bvreveal=debug` will also display additional debug comments in the HTML
-markup.
+parameter `?bvreveal=debug` to trigger the SDK to return SEO content and display
+additional debug comments in the HTML markup.
 
 The following is a full list of the parameters you can pass into the BV class
 instantiated in step 2 above:

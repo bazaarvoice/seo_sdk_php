@@ -419,6 +419,36 @@ class BaseTest extends PHPUnit_Framework_testCase
         $this->assertFalse($res);
     }
 
+    public function test_getBVReveal() {
+        $_SERVER['HTTP_USER_AGENT'] = "google";
+
+        $this->params['bvreveal'] = 'debug';
+        $obj = new Base($this->params);
+        $bvReveal = self::getMethod($obj, '_getBVReveal');
+        $res = $bvReveal->invokeArgs($obj, array());
+        $this->assertTrue($res);
+
+        $this->params['bvreveal'] = 'not_debug';
+        $obj = new Base($this->params);
+        $bvReveal = self::getMethod($obj, '_getBVReveal');
+        $res = $bvReveal->invokeArgs($obj, array());
+        $this->assertFalse($res);
+
+        unset($this->params['bvreveal']);
+
+        $this->params['page_params']['bvreveal'] = 'debug';
+        $obj = new Base($this->params);
+        $bvReveal = self::getMethod($obj, '_getBVReveal');
+        $res = $bvReveal->invokeArgs($obj, array());
+        $this->assertTrue($res);
+
+        $this->params['page_params']['bvreveal'] = 'not_debug';
+        $obj = new Base($this->params);
+        $bvReveal = self::getMethod($obj, '_getBVReveal');
+        $res = $bvReveal->invokeArgs($obj, array());
+        $this->assertFalse($res);
+    }
+
     public function test_renderAggregateRating()
     {
         $_SERVER['HTTP_USER_AGENT'] = "google";

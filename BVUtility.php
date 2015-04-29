@@ -199,7 +199,7 @@ class BVUtility
         } else {
             $newUrl = $url;
         }
-        
+
         return $newUrl;
     }
 
