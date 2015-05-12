@@ -1,5 +1,15 @@
 # Bazaarvoice SEO SDK for PHP
 
+This repository contains the codebase for the Bazaarvoice SEO SDK for PHP. Find
+out more about Bazaarvoice SEO at [Bazaarvoice Knowledge][1].
+
+## Documentation and Packaged Releases
+
+The latest SDK documentation and links to packaged releases are available at
+[Bazaarvoice Knowledge][1].
+
+## Overview
+
 The PHP SDK has the following requirements:
 
 * PHP 5+
@@ -68,8 +78,9 @@ local_seo_file_root |  None | '/home/zip/smart_seo/' | No | If using a local fil
 load_seo_file_locally |  `false` | `true` or `false` | No | Set `true` to load content from the local directory specified in `local_seo_file_root`. Local file configurations are not recommended, but may be required to overcome system limitations. A local file system can be be fragile since Bazaarvoice is not responsible for the daily retrieval, unpacking, and distribution of SEO files. To enable local files, both `load_seo_file_locally` and `local_seo_file_root` must be set.  |
 seo_sdk_enabled | `true` | `true` or `false` | No | Set `false` to disable the SDK operation and return empty strings in place of content. |
 
-To run unit tests you should first install the [phpunit][1] tool. Then in the
+To run unit tests you should first install the [phpunit][2] tool. Then in the
 folder where the bvseosdk.php file is placed run `phpunit test` to execute all
 of the tests or `phpunit test/<testName>` to run a particular test.
 
-[1]: https://phpunit.de/getting-started.html
+[1]: http://knowledge.bazaarvoice.com/bvseo/
+[2]: https://phpunit.de/getting-started.html
