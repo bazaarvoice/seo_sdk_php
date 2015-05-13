@@ -8,7 +8,7 @@ $bv = new BV(array(
   // either STORIES_LIST or STORIES_GRID
   'content_sub_type' => 'stories_grid',
   'staging' => TRUE
-    ));
+));
 ?><!DOCTYPE html>
 <html>
   <head>

@@ -6,37 +6,40 @@ require_once 'test/config.php';
 /**
  * Test BVFooter class.
  */
-class BVFooterTest extends PHPUnit_Framework_testCase
-{
-  var $params = array(
-    'bv_root_folder' => 'test',
-    'subject_id' => 'test',
-    'cloud_key' => 'test',
-    'staging' => FALSE,
-    'testing' => TRUE,
-    'seo_sdk_enabled' => TRUE,
-    'ssl_enabled' => TRUE,
-    'crawler_agent_pattern' => 'msnbot|google|teoma|bingbot|yandexbot|yahoo',
-    'bvreveal' => 'debug',
-    'content_type' => 'product',
-    'subject_type' => 'category',
-    'execution_timeout' => 300,
-    'execution_timeout_bot' => 400,
-    'charset' => 'UTF-8',
-    'load_seo_files_locally' => FALSE,
-    'local_seo_file_root' => '/test/local/file',
-    'base_url' => '/base/url',
-    'page_url' => '/page/url'
-  );
+class BVFooterTest extends PHPUnit_Framework_testCase {
+
+  protected function getParams() {
+    $params = array(
+      'bv_root_folder' => 'test',
+      'subject_id' => 'test',
+      'cloud_key' => 'test',
+      'staging' => FALSE,
+      'testing' => TRUE,
+      'seo_sdk_enabled' => TRUE,
+      'ssl_enabled' => TRUE,
+      'crawler_agent_pattern' => 'msnbot|google|teoma|bingbot|yandexbot|yahoo',
+      'bvreveal' => 'debug',
+      'content_type' => 'product',
+      'subject_type' => 'category',
+      'execution_timeout' => 300,
+      'execution_timeout_bot' => 400,
+      'charset' => 'UTF-8',
+      'load_seo_files_locally' => FALSE,
+      'local_seo_file_root' => '/test/local/file',
+      'base_url' => '/base/url',
+      'page_url' => '/page/url'
+    );
+    return $params;
+  }
 
   /**
    * Test footer.
    */
-  public function testBuildSDKFooter()
-  {
-		$_SERVER['HTTP_USER_AGENT'] = "google";
+  public function testBuildSDKFooter() {
+    $params = $this->getParams();
+    $_SERVER['HTTP_USER_AGENT'] = "google";
 
-    $base = new Base($this->params);
+    $base = new Base($params);
 
     $access_method = 'getContent';
     $msg = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit,'
@@ -54,11 +57,11 @@ class BVFooterTest extends PHPUnit_Framework_testCase
   /**
    * Test debug footer.
    */
-  public function testBuildSDKDebugFooter()
-  {
+  public function testBuildSDKDebugFooter() {
+    $params = $this->getParams();
     $_SERVER['HTTP_USER_AGENT'] = "google";
 
-    $base = new Base($this->params);
+    $base = new Base($params);
 
     $access_method = 'getContent';
     $msg = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit,'

@@ -30,8 +30,7 @@ class StoriesImplementingTest extends PHPUnit_Framework_testCase
     'include_display_integration_code' => TRUE,
   );
 
-  public function testStories()
-  {
+  public function testStories() {
     // to force is_bot mode
     $_SERVER['HTTP_USER_AGENT'] = 'google';
 
@@ -48,8 +47,8 @@ class StoriesImplementingTest extends PHPUnit_Framework_testCase
     $obj->expects($this->any())
         ->method('curlExecute')
         ->will($this->returnValue('<div id="BVRRContainer">
-						<p>Mock content for unit tests.</p>
-					</div>'));
+            <p>Mock content for unit tests.</p>
+          </div>'));
     $obj->expects($this->any())
         ->method('curlInfo')
         ->will($this->returnValue(array('http_code' => 200, 'total_time' => 100)));

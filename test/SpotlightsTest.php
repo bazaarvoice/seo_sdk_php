@@ -15,8 +15,7 @@ class SpotlightsImplementingTest extends PHPUnit_Framework_testCase
   /**
    * Test spotlights.
    */
-  public function testSpotlights()
-  {
+  public function testSpotlights() {
     $_SERVER['HTTP_USER_AGENT'] = 'google';
 
     $bv = new BV(array(

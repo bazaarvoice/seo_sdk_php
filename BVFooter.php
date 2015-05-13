@@ -3,8 +3,7 @@
 /**
  * BV PHP SEO SDK Footer
  */
-class BVFooter
-{
+class BVFooter {
   const VERSION = '2.3.0.1';
 
   private $base;
@@ -23,8 +22,7 @@ class BVFooter
    * @param string ($msg) - build message
    * @return object
    */
-  public function __construct($base, $method_type, $msg)
-  {
+  public function __construct($base, $method_type, $msg) {
     $this->base = $base;
     $this->method_type = $method_type;
     $this->msg = $msg;
@@ -38,9 +36,7 @@ class BVFooter
    * @access public
    * @return string Html formatted footer.
    */
-  public function buildSDKFooter()
-  {
-    //$access_method = !empty($this->base->config['load_seo_files_locally']) ? 'LOCAL' : 'CLOUD';
+  public function buildSDKFooter() {
     $access_method = !empty($this->base->config['internal_file_path']) ? 'LOCAL' : 'CLOUD';
     $method_type = $this->method_type;
     $time_end = microtime(true);
@@ -73,8 +69,7 @@ class BVFooter
    * @access public
    * @return string Html formatted debug footer.
    */
-  public function buildSDKDebugFooter()
-  {
+  public function buildSDKDebugFooter() {
     $staging = !empty($this->base->config['staging']) ? 'TRUE' : 'FALSE';
     $testing = !empty($this->base->config['testing']) ? 'TRUE' : 'FALSE';
     $sdk_enabled = !empty($this->base->config['seo_sdk_enabled']) ? 'TRUE' : 'FALSE';

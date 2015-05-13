@@ -6,7 +6,7 @@ $bv = new BV(array(
   'subject_id' => '',
   'cloud_key' => '',
   'page_url' => '',
-    ));
+));
 ?><!DOCTYPE html>
 <html>
   <head>

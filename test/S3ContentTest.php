@@ -13,8 +13,7 @@ class S3ContentTest extends PHPUnit_Framework_testCase
   public $product_id = 'test';
 
   // Use reflection to test private methods
-  protected static function getMethod($name)
-  {
+  protected static function getMethod($name) {
     $class = new ReflectionClass('Base');
     $method = $class->getMethod($name);
     $method->setAccessible(true);
@@ -35,8 +34,7 @@ class S3ContentTest extends PHPUnit_Framework_testCase
     'execution_timeout_bot' => 2000
   );
 
-  public function testS3InSeoUrl_seo_qa_stg()
-  {
+  public function testS3InSeoUrl_seo_qa_stg() {
     $_SERVER['HTTP_USER_AGENT'] = "google";
     $this->params['staging'] = TRUE;
     $this->params['bvreveal'] = 'sdk_disabled';
@@ -49,8 +47,7 @@ class S3ContentTest extends PHPUnit_Framework_testCase
     $this->assertContains("seo-qa-stg.bazaarvoice.com", $res);
   }
 
-  public function testS3InSeoUrl_seo_qa()
-  {
+  public function testS3InSeoUrl_seo_qa() {
     $_SERVER['HTTP_USER_AGENT'] = "google";
     $this->params['staging'] = FALSE;
     $this->params['bvreveal'] = 'sdk_disabled';

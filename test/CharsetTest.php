@@ -16,8 +16,7 @@ class CharsetTest extends PHPUnit_Framework_testCase
   );
 
   // Use reflection to test private methods
-  protected static function getMethod($name)
-  {
+  protected static function getMethod($name) {
     $class = new ReflectionClass('Base');
     $method = $class->getMethod($name);
     $method->setAccessible(true);
@@ -27,8 +26,7 @@ class CharsetTest extends PHPUnit_Framework_testCase
   /**
    * Test charset.
    */
-  public function testCharsetEncode()
-  {
+  public function testCharsetEncode() {
     $_SERVER['HTTP_USER_AGENT'] = "google";
     $this->params['charset'] = 'Windows-1251';
 
@@ -42,8 +40,7 @@ class CharsetTest extends PHPUnit_Framework_testCase
     $this->assertEquals("Кириллица", $b);
   }
 
-  public function testCharsetCheck()
-  {
+  public function testCharsetCheck() {
     $_SERVER['HTTP_USER_AGENT'] = "google";
     $this->params['charset'] = 'NOT_EXISTING_CHARSET';
 
