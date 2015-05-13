@@ -44,7 +44,7 @@ on the product page inside the `<div id="BVRRContainer"></div>`. For example:
 
     ```php
     <div id="BVRRContainer">
-        <?php echo $bv->reviews->getContent();?>
+      <?php echo $bv->reviews->getContent();?>
     </div>
     ```
 

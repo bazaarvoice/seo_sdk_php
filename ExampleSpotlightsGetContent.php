@@ -3,24 +3,24 @@
 require('bvseosdk.php');
 
 $bv = new BV(array(
-    'bv_root_folder' => '',
-    'subject_id' => '',
-    'cloud_key' => '',
-    'page_url' => '',
+  'bv_root_folder' => '',
+  'subject_id' => '',
+  'cloud_key' => '',
+  'page_url' => '',
 ));
 ?><!DOCTYPE html>
 <html>
-    <head>
-        <title>BV SDK PHP Example - GetContent</title>
-    </head>
-    <body>
-        This is a test page for Spotlights: getContent() <br>
-        GetContent() will return spotlights content <br><br>
+  <head>
+    <title>BV SDK PHP Example - GetContent</title>
+  </head>
+  <body>
+    This is a test page for Spotlights: getContent() <br>
+    GetContent() will return spotlights content <br><br>
 
-        <div id="BVRRContainer">
-            <?php echo $bv->spotlights->getContent(); ?>
-            <?php //echo $bv->spotlights->getAggregateRating(); ?>
-            <?php //echo $bv->spotlights->getReviews();?>
-        </div>
-    </body>
+    <div id="BVRRContainer">
+      <?php echo $bv->spotlights->getContent(); ?>
+      <?php //echo $bv->spotlights->getAggregateRating(); ?>
+      <?php //echo $bv->spotlights->getReviews();?>
+    </div>
+  </body>
 </html>
