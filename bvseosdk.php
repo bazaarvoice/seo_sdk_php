@@ -377,13 +377,11 @@ class Base {
   protected function _renderAggregateRating() {
     $payload = $this->_renderSEO('getAggregateRating');
 
-    if ($this->_isBot()) {
-      // remove reviews section from full_contents
-      $payload = $this->_replaceSection($payload, '<!--begin-reviews-->', '<!--end-reviews-->');
+    // remove reviews section from full_contents
+    $payload = $this->_replaceSection($payload, '<!--begin-reviews-->', '<!--end-reviews-->');
 
-      // remove pagination section from full contents
-      $payload = $this->_replaceSection($payload, '<!--begin-pagination-->', '<!--end-pagination-->');
-    }
+    // remove pagination section from full contents
+    $payload = $this->_replaceSection($payload, '<!--begin-pagination-->', '<!--end-pagination-->');
 
     return $payload;
   }
@@ -394,14 +392,12 @@ class Base {
   protected function _renderReviews() {
     $payload = $this->_renderSEO('getReviews');
 
-    if ($this->_isBot()) {
-      // remove aggregate rating section from full_contents
-      $payload = $this->_replaceSection($payload, '<!--begin-aggregate-rating-->', '<!--end-aggregate-rating-->');
+    // remove aggregate rating section from full_contents
+    $payload = $this->_replaceSection($payload, '<!--begin-aggregate-rating-->', '<!--end-aggregate-rating-->');
 
-      // Remove schema.org product text from reviews if it exists
-      $schema_org_text = "itemscope itemtype=\"http://schema.org/Product\"";
-      $payload = mb_ereg_replace($schema_org_text, '', $payload);
-    }
+    // Remove schema.org product text from reviews if it exists
+    $schema_org_text = "itemscope itemtype=\"http://schema.org/Product\"";
+    $payload = mb_ereg_replace($schema_org_text, '', $payload);
 
     return $payload;
   }
