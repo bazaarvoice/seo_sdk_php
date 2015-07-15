@@ -50,7 +50,7 @@ class BVFooterTest extends PHPUnit_Framework_testCase {
 
     $this->assertContains('li data-bvseo="ms">bvseo-msg:', $res);
     $this->assertContains('data-bvseo="sdk">bvseo_sdk, p_sdk,', $res);
-    $this->assertContains('<li data-bvseo="sp_mt">CLOUD, method:getContent,', $res);
+    $this->assertContains('<li data-bvseo="sp_mt">CLOUD, getContent,', $res);
     $this->assertContains('<li data-bvseo="ct_st">PRODUCT, CATEGORY</li>', $res);
   }
 
