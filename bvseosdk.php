@@ -763,7 +763,19 @@ class Base {
       }
     }
 
-    $content = mb_ereg_replace('{INSERT_PAGE_URI}', $this->config['base_url'] . $page_url_query_prefix, $content);
+    $content = mb_ereg_replace(
+      '{INSERT_PAGE_URI}',
+      // Make sure someone doesn't sneak in "><script>...<script> in the URL
+      // contents.
+      htmlspecialchars(
+        $this->config['base_url'] . $page_url_query_prefix,
+        ENT_QUOTES | ENT_HTML5,
+        $this->config['charset'],
+        // Don't double-encode.
+        false
+      ),
+      $content
+    );
 
     return $content;
   }

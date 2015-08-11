@@ -715,7 +715,7 @@ class BaseTest extends PHPUnit_Framework_testCase {
     $obj = new Base($params);
     $replaceTokens = self::getMethod($obj, '_replaceTokens');
     $res = $replaceTokens->invokeArgs($obj, array($str));
-    $this->assertEquals('Base url: http://www.base.url?debug=true&', $res);
+    $this->assertEquals('Base url: http://www.base.url?debug=true&amp;', $res);
 
     $base_url = 'http://www.base.url?_escaped_fragment_=';
     $params['base_url'] = $base_url;
@@ -730,6 +730,22 @@ class BaseTest extends PHPUnit_Framework_testCase {
     $replaceTokens = self::getMethod($obj, '_replaceTokens');
     $res = $replaceTokens->invokeArgs($obj, array($str));
     $this->assertEquals('Base url: http://www.base.url?_escaped_fragment_=a=b%26', $res);
+
+    // Escaping things.
+    $base_url = 'http://www.base.url?<>&"\'';
+    $params['base_url'] = $base_url;
+    $obj = new Base($params);
+    $replaceTokens = self::getMethod($obj, '_replaceTokens');
+    $res = $replaceTokens->invokeArgs($obj, array($str));
+    $this->assertEquals('Base url: http://www.base.url?&lt;&gt;&amp;&quot;&apos;&amp;', $res);
+
+    // Don't double-escape.
+    $base_url = 'http://www.base.url?&lt;&gt;&amp;&quot;&apos;';
+    $params['base_url'] = $base_url;
+    $obj = new Base($params);
+    $replaceTokens = self::getMethod($obj, '_replaceTokens');
+    $res = $replaceTokens->invokeArgs($obj, array($str));
+    $this->assertEquals('Base url: http://www.base.url?&lt;&gt;&amp;&quot;&apos;&amp;', $res);
   }
 
   public function test_setBuildMessage() {
