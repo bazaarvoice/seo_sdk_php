@@ -4,7 +4,7 @@
  * BV PHP SEO SDK Footer
  */
 class BVFooter {
-  const VERSION = '2.4.0.0';
+  const VERSION = '3.0.0';
 
   private $base;
   private $url;
