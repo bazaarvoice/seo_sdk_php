@@ -92,8 +92,6 @@ class BV {
       );
     }
 
-    $currentUrl = $this->_getCurrentUrl();
-
     // config array, defaults are defined here.
     $this->config = array(
       'staging' => FALSE,
@@ -101,7 +99,7 @@ class BV {
       'content_type' => isset($params['content_type']) ? $params['content_type'] : 'reviews',
       'subject_type' => isset($params['subject_type']) ? $params['subject_type'] : 'product',
       'page_url' => isset($params['page_url']) ? $params['page_url'] : '',
-      'base_url' => $currentUrl,
+      'base_url' => isset($params['base_url']) ? $params['base_url'] : '',
       'include_display_integration_code' => FALSE,
       'client_name' => $params['bv_root_folder'],
       'local_seo_file_root' => '',
@@ -134,12 +132,8 @@ class BV {
     //
     // We're after bvrrp, bvqap, bvsyp, and bvstate, but sweep up everything
     // while we're here.
-    $this->config['bv_page_data'] = BVUtility::parseUrlParameters($currentUrl);
     if (isset($params['page_url'])) {
-      $this->config['bv_page_data'] = array_merge(
-        BVUtility::parseUrlParameters($params['page_url']),
-        $this->config['bv_page_data']
-      );
+      $this->config['bv_page_data'] = BVUtility::parseUrlParameters($params['page_url']);
     }
 
     // Extract bvstate if present and parse that into a set of useful values.
@@ -183,38 +177,6 @@ class BV {
           throw new Exception('Invalid content_type value provided: ' . $this->config['content_type']);
       }
     }
-  }
-
-  /**
-   * Function to construct and return current URL.
-   *
-   * Since this is used to set the default for an optional config option it is
-   * included in the BV class.
-   */
-  public function _getCurrentUrl() {
-    // depending on protocol set the beginning of url and default port.
-    // Note that various servers can and do set various different values in
-    // $_SERVER['HTTPS']. See:
-    // http://stackoverflow.com/questions/1175096/how-to-find-out-if-you-are-using-https-without-serverhttps
-    if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
-      $url = 'https://';
-      $defaultPort = '443';
-    } else {
-      $url = 'http://';
-      $defaultPort = '80';
-    }
-
-    $url .= $_SERVER['SERVER_NAME'];
-
-    // if there is a port other than the defaultPort
-    // being used it needs to be included
-    if ($_SERVER['SERVER_PORT'] != $defaultPort) {
-      $url .= ':' . $_SERVER['SERVER_PORT'];
-    }
-
-    $url .= $_SERVER['REQUEST_URI'];
-
-    return $url;
   }
 
 }
@@ -763,7 +725,19 @@ class Base {
       }
     }
 
-    $content = mb_ereg_replace('{INSERT_PAGE_URI}', $this->config['base_url'] . $page_url_query_prefix, $content);
+    $content = mb_ereg_replace(
+      '{INSERT_PAGE_URI}',
+      // Make sure someone doesn't sneak in "><script>...<script> in the URL
+      // contents.
+      htmlspecialchars(
+        $this->config['base_url'] . $page_url_query_prefix,
+        ENT_QUOTES | ENT_HTML5,
+        $this->config['charset'],
+        // Don't double-encode.
+        false
+      ),
+      $content
+    );
 
     return $content;
   }

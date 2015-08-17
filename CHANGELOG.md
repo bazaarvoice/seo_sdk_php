@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.0
+ * Security updates:
+   * No longer infer page or base URL.
+   * Sanitize pagination links.
+ * Adopt semver versioning.
+
 ## 2.4.0.0
 
 * Fix sp_mt metadata value and incorrect variable names.
