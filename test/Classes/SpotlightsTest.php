@@ -45,26 +45,4 @@ class SpotlightsTest extends PHPUnit_Framework_testCase {
     $this->assertNotEmpty($res);
   }
 
-  public function testGetReviews() {
-    $params = $this->getParams();
-    $_SERVER['HTTP_USER_AGENT'] = "google";
-    $params['content_type'] = "spotlights";
-
-    $obj = new Reviews($params);
-    $res = $obj->getReviews();
-
-    $this->assertNotEmpty($res);
-  }
-
-  public function testGetAggregateRating() {
-    $params = $this->getParams();
-    $_SERVER['HTTP_USER_AGENT'] = "google";
-    $params['content_type'] = "spotlights";
-
-    $obj = new Reviews($params);
-    $res = $obj->getAggregateRating();
-
-    $this->assertNotEmpty($res);
-  }
-
 }

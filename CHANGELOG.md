@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.1.0
+
+* Seller Ratings support.
+
 ## 3.0.0
  * Security updates:
    * No longer infer page or base URL.

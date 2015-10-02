@@ -77,20 +77,8 @@ class BV {
    * @return object
    */
   public function __construct($params = array()) {
-    if (!is_array($params)) {
-      throw new Exception(
-        'BV class constructor argument $params must be an array.'
-      );
-    }
 
-    // check to make sure we have the required parameters.
-    if (empty($params['bv_root_folder']) || empty($params['subject_id'])) {
-      throw new Exception(
-        'BV class constructor argument $params is missing required keys. An ' +
-        'array containing bv_root_folder (string) and subject_id (string) is ' +
-        'expected.'
-      );
-    }
+    $this->validateParameters($params);
 
     // config array, defaults are defined here.
     $this->config = array(
@@ -160,13 +148,21 @@ class BV {
     $this->questions = new Questions($this->config);
     $this->stories = new Stories($this->config);
     $this->spotlights = new Spotlights($this->config);
+    $this->sellerratings = new SellerRatings($this->config);
 
     // Assign one to $this->SEO based on the content type.
     $ct = isset($this->config['page_params']['content_type']) ? $this->config['page_params']['content_type'] : $this->config['content_type'];
     if (isset($ct)) {
       switch ($ct) {
-        case 'reviews': $this->SEO = $this->reviews;
+        case 'reviews': {
+          $st = isset($this->config['page_params']['subject_type']) ? $this->config['page_params']['subject_type'] : $this->config['subject_type'];
+          if (isset($st) && $st == 'seller') {
+            $this->SEO = $this->sellerratings;
+          } else {
+            $this->SEO = $this->reviews;
+          }
           break;
+        }
         case 'questions': $this->SEO = $this->questions;
           break;
         case 'stories': $this->SEO = $this->stories;
@@ -179,6 +175,28 @@ class BV {
     }
   }
 
+  protected function validateParameters($params) {
+    if (!is_array($params)) {
+      throw new Exception(
+        'BV class constructor argument $params must be an array.'
+      );
+    }
+
+    // check to make sure we have the required parameters.
+    if (empty($params['bv_root_folder'])) {
+      throw new Exception(
+        'BV class constructor argument $params is missing required bv_root_folder key. An ' .
+        'array containing bv_root_folder (string) is expected.'
+        );
+    }
+
+    if (empty($params['subject_id'])) {
+      throw new Exception(
+        'BV class constructor argument $params is missing required subject_id key. An ' .
+        'array containing subject_id (string) is expected.'
+      );
+    }
+  }
 }
 // end of BV class
 
@@ -194,9 +212,8 @@ class Base {
   private $msg = '';
 
   public function __construct($params = array()) {
-    if (!is_array($params)) {
-      throw new Exception('BV Base Class missing config array.');
-    }
+
+    $this->validateParams($params);
 
     $this->config = $params;
 
@@ -206,9 +223,22 @@ class Base {
     $this->bv_config['seo-domain']['testing_staging'] = 'seo-qa-stg.bazaarvoice.com';
     $this->bv_config['seo-domain']['testing_production'] = 'seo-qa.bazaarvoice.com';
 
+    // seller rating display is a special snowflake
+    $this->bv_config['srd-domain'] = 'srd.bazaarvoice.com';
+    $this->bv_config['srd-prefix-staging'] = 'stg';
+    $this->bv_config['srd-prefix-production'] = 'prod';
+    $this->bv_config['srd-prefix-testing_staging'] = 'qa-stg';
+    $this->bv_config['srd-prefix-testing_production'] = 'qa';
+
     $this->config['latency_timeout'] = $this->_isBot()
         ? $this->config['execution_timeout_bot']
         : $this->config['execution_timeout'];
+  }
+
+  protected function validateParams($params) {
+    if (!is_array($params)) {
+      throw new Exception('BV Base Class missing config array.');
+    }
   }
 
   /**
@@ -372,6 +402,7 @@ class Base {
    * from the base class can invoke it or replace it if needed.
    *
    * @access protected
+   * @param $access_method
    * @return string
    */
   protected function _renderSEO($access_method) {
@@ -522,21 +553,35 @@ class Base {
    * @return string
    */
   private function _buildSeoUrl($page_number) {
+    $primary_selector = 'seo-domain';
+
+      // calculate, which environment should we be using
     if ($this->config['testing']) {
       if ($this->config['staging']) {
-        $hostname = $this->bv_config['seo-domain']['testing_staging'];
+        $env_selector = 'testing_staging';
       } else {
-        $hostname = $this->bv_config['seo-domain']['testing_production'];
+        $env_selector = 'testing_production';
       }
     } else {
       if ($this->config['staging']) {
-        $hostname = $this->bv_config['seo-domain']['staging'];
+        $env_selector = 'staging';
       } else {
-        $hostname = $this->bv_config['seo-domain']['production'];
+        $env_selector = 'production';
       }
     }
 
     $url_scheme = $this->config['ssl_enabled'] ? 'https://' : 'http://';
+
+    if ($this->config['content_type'] == 'reviews' &&
+      $this->config['subject_type'] == 'seller') {
+      // when content type is reviews and subject type is seller,
+      // we're dealing with seller rating, so use different primary selector
+      $primary_selector = 'srd-domain';
+      // for seller rating we use different selector for prefix
+      $hostname = $this->bv_config[$primary_selector] . '/' . $this->bv_config['srd-prefix-' . $env_selector];
+    } else {
+      $hostname = $this->bv_config[$primary_selector][$env_selector];
+    };
 
     // dictates order of URL
     $url_parts = array(
@@ -651,6 +696,8 @@ class Base {
     curl_setopt($ch, CURLOPT_TIMEOUT, ($this->config['latency_timeout'] / 1000));
     // Enable decoding of the response
     curl_setopt($ch, CURLOPT_ENCODING, 'gzip,deflate');
+    // Enable following of redirects
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 
     if ($this->config['proxy_host'] != '') {
       curl_setopt($ch, CURLOPT_PROXY, $this->config['proxy_host']);
@@ -948,7 +995,7 @@ class Spotlights extends Base {
 
     // since we are in the spotlights class
     // we need to set the content_type config
-    // to reviews so we get reviews in our
+    // to spotlights so we get reviews in our
     // SEO request
     $this->config['content_type'] = 'spotlights';
 
@@ -957,17 +1004,35 @@ class Spotlights extends Base {
     $this->config['subject_type'] = 'category';
   }
 
-  public function getAggregateRating() {
-    return $this->_renderAggregateRating();
-  }
-
-  public function getReviews() {
-    return $this->_renderReviews();
-  }
-
   public function getContent() {
     return $this->_renderSEO('getContent');
   }
+
+}
+// end of Spotlights class
+
+class SellerRatings extends Base {
+
+    function __construct($params = array()) {
+
+        // call Base Class constructor
+        parent::__construct($params);
+
+        // since we are in the Seller Rating class
+        // we need to set the content_type config
+        // to reviews so we get reviews in our
+        // SEO request
+        $this->config['content_type'] = 'reviews';
+
+        // for seller rating subject type will always
+        // need to be seller
+        $this->config['subject_type'] = 'seller';
+
+    }
+
+    public function getContent() {
+        return $this->_renderSEO('getContent');
+    }
 
 }
 // end of Spotlights class

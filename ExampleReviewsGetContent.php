@@ -5,7 +5,7 @@ $bv = new BV(array(
   'bv_root_folder' => '',
   'subject_id' => '',
   'cloud_key' => '',
-  'page_url' => '',
+  'page_url' => ''
 ));
 ?><!DOCTYPE html>
 <html>
