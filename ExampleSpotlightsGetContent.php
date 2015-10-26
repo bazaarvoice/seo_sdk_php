@@ -6,7 +6,7 @@ $bv = new BV(array(
   'bv_root_folder' => '',
   'subject_id' => '',
   'cloud_key' => '',
-  'page_url' => '',
+  'page_url' => ''
 ));
 ?><!DOCTYPE html>
 <html>
@@ -19,8 +19,6 @@ $bv = new BV(array(
 
     <div id="BVRRContainer">
       <?php echo $bv->spotlights->getContent(); ?>
-      <?php //echo $bv->spotlights->getAggregateRating(); ?>
-      <?php //echo $bv->spotlights->getReviews();?>
     </div>
   </body>
 </html>

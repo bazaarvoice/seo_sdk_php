@@ -7,7 +7,7 @@ $bv = new BV(array(
   'cloud_key' => '',
   'content_type' => 'questions',
   'subject_type' => 'category',
-  'staging' => TRUE,
+  'staging' => TRUE
 ));
 ?><!DOCTYPE html>
 <html>

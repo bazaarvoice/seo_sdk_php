@@ -30,13 +30,6 @@ class SpotlightsImplementingTest extends PHPUnit_Framework_testCase
     $this->assertContains('seo.bazaarvoice.com/test/test/spotlights/category/1/test.htm', $content);
     $this->assertContains('getContent', $content);
 
-    $content = $bv->spotlights->getAggregateRating();
-    $this->assertNotNull($content, "There should be content to proceed further assertion!!");
-    $this->assertContains('getAggregateRating', $content);
-
-    $content = $bv->spotlights->getReviews();
-    $this->assertNotNull($content, "There should be content to proceed further assertion!!");
-    $this->assertContains('getReviews', $content);
   }
 
 }

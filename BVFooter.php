@@ -4,7 +4,7 @@
  * BV PHP SEO SDK Footer
  */
 class BVFooter {
-  const VERSION = '3.0.0';
+  const VERSION = '3.1.0';
 
   private $base;
   private $url;
@@ -91,10 +91,12 @@ class BVFooter {
     $footer .= "\n" . '   <li data-bvseo="staging">' . $staging . '</li>';
     $footer .= "\n" . '   <li data-bvseo="testing">' . $testing . '</li>';
     $footer .= "\n" . '   <li data-bvseo="seo.sdk.enabled">' . $sdk_enabled . '</li>';
-    $footer .= "\n" . '   <li data-bvseo="stagingS3Hostname">' . $this->base->bv_config['seo-domain']['staging'] . '</li>';
-    $footer .= "\n" . '   <li data-bvseo="productionS3Hostname">' . $this->base->bv_config['seo-domain']['production'] . '</li>';
-    $footer .= "\n" . '   <li data-bvseo="testingStagingS3Hostname">' . $this->base->bv_config['seo-domain']['testing_staging'] . '</li>';
-    $footer .= "\n" . '   <li data-bvseo="testingProductionS3Hostname">' . $this->base->bv_config['seo-domain']['testing_production'] . '</li>';
+    if (!isset($this->base->config['subject_type']) || $this->base->config['subject_type'] != 'seller') {
+      $footer .= "\n" . '   <li data-bvseo="stagingS3Hostname">' . $this->base->bv_config['seo-domain']['staging'] . '</li>';
+      $footer .= "\n" . '   <li data-bvseo="productionS3Hostname">' . $this->base->bv_config['seo-domain']['production'] . '</li>';
+      $footer .= "\n" . '   <li data-bvseo="testingStagingS3Hostname">' . $this->base->bv_config['seo-domain']['testing_staging'] . '</li>';
+      $footer .= "\n" . '   <li data-bvseo="testingProductionS3Hostname">' . $this->base->bv_config['seo-domain']['testing_production'] . '</li>';
+    }
     $footer .= "\n" . '   <li data-bvseo="proxyHost">' . $proxy_host . '</li>';
     $footer .= "\n" . '   <li data-bvseo="proxyPort">' . $proxy_port . '</li>';
     $footer .= "\n" . '   <li data-bvseo="seo.sdk.execution.timeout.bot">' . $this->base->config['execution_timeout_bot'] . '</li>';

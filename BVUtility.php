@@ -32,7 +32,8 @@ class BVUtility {
     'p' => 'PRODUCT',
     'c' => 'CATEGORY',
     'e' => 'ENTRY',
-    'd' => 'DETAIL'
+    'd' => 'DETAIL',
+    's' => 'SELLER'
   );
 
   /**
