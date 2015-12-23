@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.1.1
+
+* Pass-through of User Agent to gather statistics.
+
 ## 3.1.0
 
 * Seller Ratings support.
