@@ -6,7 +6,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.bazaarvoice</groupId>
   <artifactId>bv-seo-sdk-php</artifactId>
-  <version>3.1.1</version>
+  <version>3.2.0</version>
   <name>bv-seo-sdk-php</name>
   <description>Bazaarvoice SEO SDK for PHP.</description>
 
