@@ -233,6 +233,9 @@ class Base {
     $this->config['latency_timeout'] = $this->_isBot()
         ? $this->config['execution_timeout_bot']
         : $this->config['execution_timeout'];
+
+    // set up combined user agent to be passed to cloud storage (if needed)
+    $this->config['user_agent'] = "bv_php_sdk/3.2.0;" . $_SERVER['HTTP_USER_AGENT'];
   }
 
   protected function validateParams($params) {
@@ -698,6 +701,10 @@ class Base {
     curl_setopt($ch, CURLOPT_ENCODING, 'gzip,deflate');
     // Enable following of redirects
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    // set user agent if needed
+    if ($this->config['user_agent'] != '') {
+        curl_setopt($ch, CURLOPT_USERAGENT, $this->config['user_agent']);
+    }
 
     if ($this->config['proxy_host'] != '') {
       curl_setopt($ch, CURLOPT_PROXY, $this->config['proxy_host']);
