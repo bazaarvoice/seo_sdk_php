@@ -19,6 +19,10 @@
     <connection>${scm.connection.url}</connection>
   </scm>
 
+  <properties>
+    <destination.bucket></destination.bucket>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.scm</groupId>
@@ -59,12 +63,12 @@
 
       <!--
       Upload the install script into the scripts directory.
-      Usage: mvn -Ds3.repo.path=<THE_PATH> -Dartifact.source=<ARTIFACT_DIR> deploy
+      Usage: mvn -Ds3.repo.path=<THE_PATH> -Dartifact.source=<ARTIFACT_DIR> -Ddestination.bucket=<S3 BUCKET NAME> deploy
       -->
       <plugin>
         <groupId>com.bazaarvoice.maven.plugins</groupId>
         <artifactId>s3-upload-maven-plugin</artifactId>
-        <version>1.2</version>
+        <version>1.4</version>
         <executions>
           <execution>
             <phase>deploy</phase>
@@ -72,7 +76,7 @@
               <goal>s3-upload</goal>
             </goals>
             <configuration>
-              <bucketName>nexus-private-artifacts</bucketName>
+              <bucketName>${destination.bucket}</bucketName>
               <source>
                 ${artifact.source}/${project.name}-${project.version}-assembly.zip
               </source>
