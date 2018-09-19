@@ -1,12 +1,14 @@
 <?php
 
+namespace Bazaarvoice;
+
 require_once 'bvseosdk.php';
 require_once 'test/config.php';
 
 /**
  * Test BVFooter class.
  */
-class BVFooterTest extends PHPUnit_Framework_testCase {
+class BVFooterTest extends \PHPUnit\Framework\TestCase {
 
   protected function getParams() {
     $params = array(

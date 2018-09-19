@@ -1,5 +1,7 @@
 <?php
 
+namespace Bazaarvoice;
+
 /**
  * BV PHP SEO SDK Utilities.
  */
@@ -57,7 +59,7 @@ class BVUtility {
       foreach ($typeArray as $key => $value) {
         $supportList[] = $key . '=' . $value;
       }
-      throw new Exception('Obtained not supported ' . $typeName
+      throw new \Exception('Obtained not supported ' . $typeName
       . '. BV Class supports following ' . $typeName . ': '
       . implode(', ', $supportList));
     }

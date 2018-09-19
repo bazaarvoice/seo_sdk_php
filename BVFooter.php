@@ -1,8 +1,11 @@
 <?php
 
 /**
- * BV PHP SEO SDK Footer
- */
+* BV PHP SEO SDK Footer
+*/
+
+namespace Bazaarvoice;
+
 class BVFooter {
   const VERSION = '3.2.1';
 

@@ -2,7 +2,7 @@
 //Please provide cloud_key and bv_root_folder
 require('bvseosdk.php');
 
-$bv = new BV(array(
+$bv = new Bazaarvoice\BV(array(
     'bv_root_folder' => '',
     'cloud_key' => '',
     'page_url' => '',
