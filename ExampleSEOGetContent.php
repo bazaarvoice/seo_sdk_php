@@ -1,6 +1,6 @@
 <?php
 //Please provide cloud_key, bv_root_folder and subject_id
-require('bvseosdk.php');
+require('src/bvseosdk.php');
 $bv = new Bazaarvoice\BV(array(
   'bv_root_folder' => '',
   'subject_id' => '',
