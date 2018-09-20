@@ -1,6 +1,6 @@
 <?php
 
-require_once 'bvseosdk.php';
+require_once 'src/bvseosdk.php';
 require_once 'test/config.php';
 
 /**

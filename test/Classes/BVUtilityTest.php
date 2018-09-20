@@ -2,7 +2,7 @@
 
 namespace Bazaarvoice;
 
-require_once 'BVUtility.php';
+require_once 'src/BVUtility.php';
 require_once 'test/config.php';
 
 /**

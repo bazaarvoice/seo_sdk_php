@@ -17,10 +17,15 @@
     },
     "autoload": {
         "psr-4": {
-            "Bazaarvoice\\": "src"
+            "Bazaarvoice\\": "src/"
         },
         "files": [
             "bvseosdk.php"
         ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Bazaarvoice\\": "test/"
+        }
     }
 }
