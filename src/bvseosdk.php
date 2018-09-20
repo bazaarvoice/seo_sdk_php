@@ -21,7 +21,7 @@
  *
  * require(bvsdk.php);
  *
- * $bv = new Bazaarvoice\BV(array(
+ * $bv = new BazaarvoiceSeo\BV(array(
  *  'bv_root_folder' => '1234-en_US',
  *  'subject_id' => 'XXYYY',
  *  'cloud_key' => 'company-cdfa682b84bef44672efed074093ccd3',
@@ -30,7 +30,7 @@
  *
  */
 
-namespace Bazaarvoice;
+namespace BazaarvoiceSeo;
 
 require_once 'BVUtility.php';
 require_once 'BVFooter.php';

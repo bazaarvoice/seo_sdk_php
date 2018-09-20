@@ -34,7 +34,7 @@ class StoriesImplementingTest extends \PHPUnit\Framework\TestCase
     // to force is_bot mode
     $_SERVER['HTTP_USER_AGENT'] = 'google';
 
-    $obj = $this->getMockBuilder('Bazaarvoice\Stories')
+    $obj = $this->getMockBuilder('BazaarvoiceSeo\Stories')
         ->setConstructorArgs(array($this->params))
         ->setMethods(['curlError', 'curlErrorNo', 'curlExecute', 'curlInfo'])
         ->getMock();

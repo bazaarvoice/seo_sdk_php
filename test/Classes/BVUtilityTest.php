@@ -1,6 +1,6 @@
 <?php
 
-namespace Bazaarvoice;
+namespace BazaarvoiceSeo;
 
 require_once 'src/BVUtility.php';
 require_once 'test/config.php';

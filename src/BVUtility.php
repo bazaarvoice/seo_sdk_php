@@ -1,6 +1,6 @@
 <?php
 
-namespace Bazaarvoice;
+namespace BazaarvoiceSeo;
 
 /**
  * BV PHP SEO SDK Utilities.

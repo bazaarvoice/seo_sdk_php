@@ -4,7 +4,7 @@
 * BV PHP SEO SDK Footer
 */
 
-namespace Bazaarvoice;
+namespace BazaarvoiceSeo;
 
 class BVFooter {
   const VERSION = '3.2.1';

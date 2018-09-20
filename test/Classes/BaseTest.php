@@ -1,6 +1,6 @@
 <?php
 
-namespace Bazaarvoice;
+namespace BazaarvoiceSeo;
 
 require_once 'src/bvseosdk.php';
 require_once 'test/config.php';
@@ -184,7 +184,7 @@ class BaseTest extends \PHPUnit\Framework\TestCase {
   public function test_fetchCloudContent() {
     $params = $this->getParams();
     $_SERVER['HTTP_USER_AGENT'] = "google";
-    $obj = $this->getMockBuilder('Bazaarvoice\Base')
+    $obj = $this->getMockBuilder('BazaarvoiceSeo\Base')
         ->setConstructorArgs(array($params))
         ->setMethods(['curlError', 'curlErrorNo', 'curlExecute', 'curlInfo'])
         ->getMock();
@@ -214,7 +214,7 @@ class BaseTest extends \PHPUnit\Framework\TestCase {
         ->will($this->returnValue(array('http_code' => 200, 'total_time' => 100)));
 
 
-    $obj = $this->getMockBuilder('Bazaarvoice\Base')
+    $obj = $this->getMockBuilder('BazaarvoiceSeo\Base')
         ->setConstructorArgs(array($params))
         ->setMethods(['curlError', 'curlErrorNo', 'curlExecute', 'curlInfo'])
         ->getMock();
@@ -266,7 +266,7 @@ class BaseTest extends \PHPUnit\Framework\TestCase {
     $_SERVER['HTTP_USER_AGENT'] = "google";
     $params['load_seo_files_locally'] = FALSE;
 
-    $obj = $this->getMockBuilder('Bazaarvoice\Base')
+    $obj = $this->getMockBuilder('BazaarvoiceSeo\Base')
         ->setConstructorArgs(array($params))
         ->setMethods(['curlError', 'curlErrorNo', 'curlExecute', 'curlInfo'])
         ->getMock();
@@ -302,7 +302,7 @@ class BaseTest extends \PHPUnit\Framework\TestCase {
     $params = $this->getParams();
     $_SERVER['HTTP_USER_AGENT'] = "google";
     $params['seo_sdk_enabled'] = TRUE;
-    $obj = $this->getMockBuilder('Bazaarvoice\Base')
+    $obj = $this->getMockBuilder('BazaarvoiceSeo\Base')
         ->setConstructorArgs(array($params))
         ->setMethods(['curlError', 'curlErrorNo', 'curlExecute', 'curlInfo'])
         ->getMock();
@@ -555,7 +555,7 @@ class BaseTest extends \PHPUnit\Framework\TestCase {
     $params = $this->getParams();
     $_SERVER['HTTP_USER_AGENT'] = "google";
 
-    $obj = $this->getMockBuilder('Bazaarvoice\Base')
+    $obj = $this->getMockBuilder('BazaarvoiceSeo\Base')
         ->setConstructorArgs(array($params))
         ->setMethods(['curlError', 'curlErrorNo', 'curlExecute', 'curlInfo'])
         ->getMock();
@@ -592,7 +592,7 @@ class BaseTest extends \PHPUnit\Framework\TestCase {
     $params = $this->getParams();
     $_SERVER['HTTP_USER_AGENT'] = "google";
 
-    $obj = $this->getMockBuilder('Bazaarvoice\Base')
+    $obj = $this->getMockBuilder('BazaarvoiceSeo\Base')
         ->setConstructorArgs(array($params))
         ->setMethods(['curlError', 'curlErrorNo', 'curlExecute', 'curlInfo'])
         ->getMock();
@@ -630,7 +630,7 @@ class BaseTest extends \PHPUnit\Framework\TestCase {
     //is bot
     $_SERVER['HTTP_USER_AGENT'] = "google";
 
-    $obj = $this->getMockBuilder('Bazaarvoice\Base')
+    $obj = $this->getMockBuilder('BazaarvoiceSeo\Base')
         ->setConstructorArgs(array($params))
         ->setMethods(['curlError', 'curlErrorNo', 'curlExecute', 'curlInfo'])
         ->getMock();
@@ -659,7 +659,7 @@ class BaseTest extends \PHPUnit\Framework\TestCase {
     //is not bot
     $_SERVER['HTTP_USER_AGENT'] = "NOT_BOT";
     $params['execution_timeout'] = 0;
-    $obj = $this->getMockBuilder('Bazaarvoice\Base')
+    $obj = $this->getMockBuilder('BazaarvoiceSeo\Base')
         ->setConstructorArgs(array($params))
         ->setMethods(['curlError', 'curlErrorNo', 'curlExecute', 'curlInfo'])
         ->getMock();
