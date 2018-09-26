@@ -1,5 +1,5 @@
 {
-    "name": "bazaarvoice/seo_sdk_php",
+    "name": "leroy-merlin-br/seo_sdk_php",
     "type": "library",
     "description": "Bazaarvoice SEO SDK for PHP",
     "keywords": [
@@ -7,7 +7,7 @@
         "seo",
         "php"
     ],
-    "homepage": "https://github.com/bazaarvoice/seo_sdk_php",
+    "homepage": "https://github.com/leroy-merlin-br/seo_sdk_php",
     "license": "MIT",
     "require": {
         "php": ">=5.3"
