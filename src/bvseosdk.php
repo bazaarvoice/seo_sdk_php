@@ -234,7 +234,7 @@ class Base {
         : $this->config['execution_timeout'];
 
     // set up combined user agent to be passed to cloud storage (if needed)
-    $this->config['user_agent'] = "bv_php_sdk/3.2.1;" . $_SERVER['HTTP_USER_AGENT'];
+    $this->config['user_agent'] = "bv_php_sdk/3.2.1;" . $this->_getUserAgentFromServer();
   }
 
   protected function validateParams($params) {
@@ -438,6 +438,18 @@ class Base {
   //--------------------------------------------------------------------
 
   /**
+   * _getUserAgentFromServer
+   *
+   * Helper method to get the user agent from the $_SERVER variable.
+   *
+   * @access private
+   * @return bool
+   */
+  private function _getUserAgentFromServer() {
+    return empty($_SERVER['HTTP_USER_AGENT']) ? '' : $_SERVER['HTTP_USER_AGENT'];
+  }
+
+  /**
    * isBot
    *
    * Helper method to determine if current request is a bot or not. Will
@@ -453,7 +465,7 @@ class Base {
     }
 
     // search the user agent string for an indication if this is a search bot or not
-    return mb_eregi('(' . $this->config['crawler_agent_pattern'] . ')', $_SERVER['HTTP_USER_AGENT']);
+    return mb_eregi('(' . $this->config['crawler_agent_pattern'] . ')', $this->_getUserAgentFromServer());
   }
 
   /**

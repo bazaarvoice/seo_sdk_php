@@ -79,6 +79,8 @@ class BVFooter {
     $local_seo_file_root = (!empty($this->base->config['load_seo_files_locally'])) ? $this->base->config['local_seo_file_root'] : 'FALSE';
     $content_type = mb_strtoupper($this->base->config['content_type']);
     $subject_type = mb_strtoupper($this->base->config['subject_type']);
+    $userAgent = empty($_SERVER['HTTP_USER_AGENT']) ? '' : $_SERVER['HTTP_USER_AGENT'];
+
     if (!empty($this->base->config['page_params']['subject_id'])
         && !empty($this->base->config['page_params']['content_type'])
         && $this->base->config['page_params']['content_type'] == $this->base->config['content_type']) {
@@ -113,7 +115,7 @@ class BVFooter {
 
     $footer .= "\n" . '   <li data-bvseo="en">' . $sdk_enabled . '</li>';
     $footer .= "\n" . '   <li data-bvseo="pn">bvseo-' . $this->base->config['page'] . '</li>';
-    $footer .= "\n" . '   <li data-bvseo="userAgent">' . $_SERVER['HTTP_USER_AGENT'] . '</li>';
+    $footer .= "\n" . '   <li data-bvseo="userAgent">' . $userAgent . '</li>';
     $footer .= "\n" . '   <li data-bvseo="pageURI">' . $this->base->config['page_url'] . '</li>';
     $footer .= "\n" . '   <li data-bvseo="baseURI">' . $this->base->config['base_url'] . '</li>';
     $footer .= "\n" . '   <li data-bvseo="contentType">' . $content_type . '</li>';
