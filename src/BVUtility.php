@@ -143,7 +143,7 @@ class BVUtility {
         // to win over fragment if there are the same parameters in both, then
         // only add if not already there.
         if (!isset($params[$values[0]])) {
-          $params[$values[0]] = $values[1];
+          $params[$values[0]] = urldecode($values[1]);
         }
       }
     }
