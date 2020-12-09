@@ -2,9 +2,6 @@
 
 namespace BazaarvoiceSeo;
 
-require_once 'src/bvseosdk.php';
-require_once 'tests/config.php';
-
 /**
  * Test testing S3 content.
  */

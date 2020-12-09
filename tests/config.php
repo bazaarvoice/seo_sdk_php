@@ -1,4 +1,5 @@
 <?php
+require_once 'vendor/autoload.php';
 
 $_SERVER['SERVER_NAME'] = "localhost";
 $_SERVER['SERVER_PORT'] = "80";

@@ -88,12 +88,12 @@ class Base {
         if (isset($this->config['charset'])) {
             $supportedCharsets = mb_list_encodings();
             if (!in_array($this->config['charset'], $supportedCharsets)) {
-                $this->config['charset'] = DEFAULT_CHARSET;
+                $this->config['charset'] = 'UTF-8';
                 $this->_setBuildMessage("Charset is not configured properly. "
                                         . "BV-SEO-SDK will load default charset and continue.");
             }
         } else {
-            $this->config['charset'] = DEFAULT_CHARSET;
+            $this->config['charset'] = 'UTF-8';
         }
     }
 

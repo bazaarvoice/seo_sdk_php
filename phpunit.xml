@@ -3,6 +3,7 @@
          backupStaticAttributes="false"
          beStrictAboutTestsThatDoNotTestAnything="false"
          colors="true"
+         bootstrap="tests/config.php"
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
