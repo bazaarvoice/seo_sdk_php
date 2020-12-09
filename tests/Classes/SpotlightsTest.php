@@ -3,12 +3,12 @@
 namespace BazaarvoiceSeo;
 
 require_once 'src/bvseosdk.php';
-require_once 'test/config.php';
+require_once 'tests/config.php';
 
 /**
- * Test Question class.
+ * Test Spotlights class.
  */
-class QuestionsTest extends \PHPUnit\Framework\TestCase {
+class SpotlightsTest extends \PHPUnit\Framework\TestCase {
 
   protected function getParams() {
     $params = array(
@@ -39,27 +39,12 @@ class QuestionsTest extends \PHPUnit\Framework\TestCase {
   public function testGetContent() {
     $params = $this->getParams();
     $_SERVER['HTTP_USER_AGENT'] = "google";
+    $params['content_type'] = "spotlights";
 
-    $obj = new Questions($params);
+    $obj = new Spotlights($params);
     $res = $obj->getContent();
 
-    $script_line = '<script>
-           $BV.ui("qa", "show_questions", {
-             productId: "test"
-           });
-         </script>';
-    $this->assertContains($script_line, $res);
-
-    $params['include_display_integration_code'] = FALSE;
-    $obj = new Questions($params);
-    $res = $obj->getContent();
-
-    $script_line = '<script>
-           $BV.ui("qa", "show_questions", {
-             productId: "test"
-           });
-         </script>';
-    $this->assertNotContains($script_line, $res);
+    $this->assertNotEmpty($res);
   }
 
 }

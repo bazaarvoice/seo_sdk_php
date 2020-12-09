@@ -3,7 +3,7 @@
 namespace BazaarvoiceSeo;
 
 require_once 'src/bvseosdk.php';
-require_once 'test/config.php';
+require_once 'tests/config.php';
 
 /**
  * Test Base class.
@@ -202,7 +202,7 @@ class BaseTest extends \PHPUnit\Framework\TestCase {
         ->will($this->returnValue(array('http_code' => 403, 'total_time' => 100)));
 
 
-    $path = 'test/data/universalSEO.html';
+    $path = 'tests/data/universalSEO.html';
     $res = '';
     $fetchCloudContent = self::getMethod($obj, '_fetchCloudContent');
     $res = $fetchCloudContent->invokeArgs($obj, array($path));
@@ -241,7 +241,7 @@ class BaseTest extends \PHPUnit\Framework\TestCase {
   public function test_fetchFileContent() {
     $params = $this->getParams();
     $_SERVER['HTTP_USER_AGENT'] = "google";
-    $path = 'test/data/universalSEO.html';
+    $path = 'tests/data/universalSEO.html';
 
     $obj = new Base($params);
     $fetchFileContent = self::getMethod($obj, '_fetchFileContent');
@@ -284,7 +284,7 @@ class BaseTest extends \PHPUnit\Framework\TestCase {
         ->will($this->returnValue(array('http_code' => 200, 'total_time' => 100)));
 
 
-    $path = 'test/data/universalSEO.html';
+    $path = 'tests/data/universalSEO.html';
     $fetchSeoContent = self::getMethod($obj, '_fetchSeoContent');
     $res = $fetchSeoContent->invokeArgs($obj, array($path));
 
