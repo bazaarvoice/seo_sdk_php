@@ -1,7 +1,6 @@
 <?php
 //Please provide cloud_key, bv_root_folder and product_id
-require('src/bvseosdk.php');
-
+require('vendor/autoload.php');
 $bv = new BazaarvoiceSeo\BV(array(
   'bv_root_folder' => '',
   'subject_id' => '',

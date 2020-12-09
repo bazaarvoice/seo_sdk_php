@@ -2,13 +2,10 @@
 
 namespace BazaarvoiceSeo;
 
-require_once 'src/bvseosdk.php';
-require_once 'test/config.php';
-
 /**
- * Test Stories class.
+ * Test Reviews class.
  */
-class StoriesTest extends \PHPUnit\Framework\TestCase {
+class ReviewsTest extends \PHPUnit\Framework\TestCase {
 
   protected function getParams() {
     $params = array(
@@ -36,30 +33,50 @@ class StoriesTest extends \PHPUnit\Framework\TestCase {
     return $params;
   }
 
+  public function testGetAggregateRating() {
+    $params = $this->getParams();
+    $_SERVER['HTTP_USER_AGENT'] = "google";
+
+    $obj = new Reviews($params);
+    $res = $obj->getAggregateRating();
+
+    $this->assertNotEmpty($res);
+  }
+
   public function testGetContent() {
     $params = $this->getParams();
     $_SERVER['HTTP_USER_AGENT'] = "google";
 
-    $obj = new Stories($params);
+    $obj = new Reviews($params);
     $res = $obj->getContent();
 
     $script_line = '<script>
-           $BV.ui("su", "show_stories", {
+           $BV.ui("rr", "show_reviews", {
              productId: "test"
            });
          </script>';
     $this->assertContains($script_line, $res);
 
     $params['include_display_integration_code'] = FALSE;
-    $obj = new Stories($params);
+    $obj = new Reviews($params);
     $res = $obj->getContent();
 
     $script_line = '<script>
-           $BV.ui("su", "show_stories", {
+           $BV.ui("rr", "show_reviews", {
              productId: "test"
            });
          </script>';
     $this->assertNotContains($script_line, $res);
+  }
+
+  public function testGetReviews() {
+    $params = $this->getParams();
+    $_SERVER['HTTP_USER_AGENT'] = "google";
+
+    $obj = new Reviews($params);
+    $res = $obj->getReviews();
+
+    $this->assertNotEmpty($res);
   }
 
 }

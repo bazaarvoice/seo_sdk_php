@@ -1,6 +1,6 @@
 <?php
 //Please provide cloud_key, bv_root_folder and subject_id
-require('src/bvseosdk.php');
+require('vendor/autoload.php');
 $bv = new BazaarvoiceSeo\BV(array(
   'bv_root_folder' => '',
   'subject_id' => '',
@@ -10,14 +10,14 @@ $bv = new BazaarvoiceSeo\BV(array(
 ?><!DOCTYPE html>
 <html>
   <head>
-    <title>BV SDK PHP Example - GetContent</title>
+    <title>BV SDK PHP Example - getReviews</title>
   </head>
   <body>
-    This is a test page for Reviews: getContent() <br>
-    GetContent() will return reviews and aggregate content <br><br>
+    This is a test page for Reviews: getReviews()<br>
+    This will return review content<br><br>
 
     <div id="BVRRContainer">
-      <?php echo $bv->reviews->getContent(); ?>
+      <?php echo $bv->reviews->getReviews(); ?>
     </div>
   </body>
 </html>
