@@ -14,7 +14,7 @@ class BVFooter {
    * BVFooter Class Constructor
    *
    * @access public
-   * @param array ($base) - base class parameters
+   * @param object ($base) - base class parameters
    * @param string ($access_method) - access method
    * @param string ($msg) - build message
    * @return object
