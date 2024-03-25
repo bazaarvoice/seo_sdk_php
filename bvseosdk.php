@@ -205,6 +205,7 @@ class BV {
  * Configuration array is required for creation class object.
  *
  */
+#[\AllowDynamicProperties]
 class Base {
   private $msg = '';
 
