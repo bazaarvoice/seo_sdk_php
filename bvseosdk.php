@@ -61,6 +61,7 @@ define('DEFAULT_CHARSET', 'UTF-8');
  *    charset (string) (defaults to UTF-8, to set alternate character for SDK output)
  *    crawler_agent_pattern (string) (defaults to msnbot|googlebot|teoma|bingbot|yandexbot|yahoo)
  */
+#[\AllowDynamicProperties]
 class BV {
 
   /**
@@ -204,6 +205,7 @@ class BV {
  * Configuration array is required for creation class object.
  *
  */
+#[\AllowDynamicProperties]
 class Base {
   private $msg = '';
 
